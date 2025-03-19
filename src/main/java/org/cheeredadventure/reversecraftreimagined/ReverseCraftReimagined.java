@@ -56,7 +56,7 @@ public class ReverseCraftReimagined {
   // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "examplemod" namespace
   public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(
     Registries.CREATIVE_MODE_TAB, MODID);
-  // Creates a creative tab with the id "examplemod:example_tab" for the example item, that is placed after the combat tab
+  @SuppressWarnings("unused")
   public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register(
     "example_tab", () -> CreativeModeTab.builder()
       .title(Component.literal("ReverseCraft Reimagined MOD"))
@@ -101,8 +101,9 @@ public class ReverseCraftReimagined {
         LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
       }
 
-      LOGGER.info(Config.COMMON.getMisc().getMagicNumberIntroduction() + Config.COMMON.getMisc()
-        .getMagicNumber());
+      LOGGER.info("{}{}",
+        Config.COMMON.getMisc().getMagicNumberIntroduction(),
+        Config.COMMON.getMisc().getMagicNumber());
 
       Config.COMMON.getMisc().getItemStrings()
         .stream()

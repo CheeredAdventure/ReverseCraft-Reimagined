@@ -32,8 +32,8 @@ import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod(ExampleMod.MODID)
-public class ExampleMod {
+@Mod(ReverseCraftReimagined.MODID)
+public class ReverseCraftReimagined {
 
   // Define mod id in a common place for everything to reference
   public static final String MODID = "reversecraftreimagined";
@@ -69,7 +69,7 @@ public class ExampleMod {
   // Directly reference a slf4j logger
   private static final Logger LOGGER = LogUtils.getLogger();
 
-  public ExampleMod(FMLJavaModLoadingContext context) {
+  public ReverseCraftReimagined(FMLJavaModLoadingContext context) {
     IEventBus modEventBus = context.getModEventBus();
 
     // Register the commonSetup method for modloading
@@ -93,21 +93,23 @@ public class ExampleMod {
   }
 
   private void commonSetup(final FMLCommonSetupEvent event) {
-    // Some common setup code
-    LOGGER.info("HELLO FROM COMMON SETUP");
+    event.enqueueWork(() -> {
+      // Some common setup code
+      LOGGER.info("HELLO FROM COMMON SETUP");
 
-    if (Config.COMMON.getMisc().getLogDirtBlock()) {
-          LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
+      if (Config.COMMON.getMisc().getLogDirtBlock()) {
+        LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
       }
 
-    LOGGER.info(Config.COMMON.getMisc().getMagicNumberIntroduction() + Config.COMMON.getMisc()
-      .getMagicNumber());
+      LOGGER.info(Config.COMMON.getMisc().getMagicNumberIntroduction() + Config.COMMON.getMisc()
+        .getMagicNumber());
 
-    Config.COMMON.getMisc().getItemStrings()
-      .parallelStream()
-      .map(itemString -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(itemString)))
-      .filter(Objects::nonNull)
-      .forEach((item) -> LOGGER.info("ITEM >> {}", item));
+      Config.COMMON.getMisc().getItemStrings()
+        .stream()
+        .map(itemString -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(itemString)))
+        .filter(Objects::nonNull)
+        .forEach((item) -> LOGGER.info("ITEM >> {}", item));
+    });
   }
 
   // Add the example block item to the building blocks tab
@@ -130,9 +132,11 @@ public class ExampleMod {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-      // Some client setup code
-      LOGGER.info("HELLO FROM CLIENT SETUP");
-      LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+      event.enqueueWork(() -> {
+        // Some client setup code
+        LOGGER.info("HELLO FROM CLIENT SETUP");
+        LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+      });
     }
   }
 }

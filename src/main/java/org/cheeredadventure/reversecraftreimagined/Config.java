@@ -3,101 +3,92 @@ package org.cheeredadventure.reversecraftreimagined;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.IConfigSpec;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.commons.lang3.tuple.Pair;
 
 // An example config class. This is not required, but it's a good idea to have one to keep your config organized.
 // Demonstrates how to use Forge's config APIs
-@Mod.EventBusSubscriber(modid = ExampleMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Config {
 
-  Config(ForgeConfigSpec.Builder builder) {
+  public static final Config.Common COMMON;
+  static final ForgeConfigSpec commonSpec;
 
-  }
-
-  private static final ForgeConfigSpec.Builder BUILDER;
-  private static final ForgeConfigSpec.ConfigValue<String> MAGIC_NUMBER_INTRODUCTION;
-  private static final ForgeConfigSpec.BooleanValue LOG_DIRT_BLOCK;
-  private static final ForgeConfigSpec.IntValue MAGIC_NUMBER;
-  // a list of strings that are treated as resource locations for items
-  private static final ForgeConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS;
   static {
-    BUILDER = new ForgeConfigSpec.Builder();
-
-    MAGIC_NUMBER_INTRODUCTION = BUILDER
-      .comment("What you want the introduction message to be for the magic number")
-      .define("magicNumberIntroduction", "The magic number is... ");
-    LOG_DIRT_BLOCK = BUILDER
-      .comment("Whether to log the dirt block on common setup")
-      .define("logDirtBlock", true);
-    MAGIC_NUMBER = BUILDER
-      .comment("A magic number")
-      .defineInRange("magicNumber", 42, 0, Integer.MAX_VALUE);
-    ITEM_STRINGS = BUILDER
-      .comment("A list of items to log on common setup.")
-      .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), Config::validateItemName);
-
-    SPEC = BUILDER.build();
-  }
-  private static final ForgeConfigSpec SPEC;
-  private static boolean logDirtBlock;
-  private static int magicNumber;
-  private static String magicNumberIntroduction;
-  private static Set<Item> items;
-
-  private static boolean validateItemName(final Object obj) {
-    return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(
-      new ResourceLocation(itemName));
+    final Pair<Common, ForgeConfigSpec> commonSpecPair = new ForgeConfigSpec.Builder().configure(
+      Common::new);
+    commonSpec = commonSpecPair.getRight();
+    COMMON = commonSpecPair.getLeft();
   }
 
-  @SubscribeEvent
-  static void onLoad(final ModConfigEvent event) {
-    logDirtBlock = LOG_DIRT_BLOCK.get();
-    magicNumber = MAGIC_NUMBER.get();
-    magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
-
-    // convert the list of strings into a set of items
-    items = ITEM_STRINGS.get().stream()
-      .map(itemName -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName)))
-      .collect(Collectors.toSet());
+  public static void saveClientConfig() {
+    //TODO:  clientSpec.save();
   }
 
-  public static class ConfigService {
-    private static ConfigService INSTANCE;
+  @Getter
+  public static class Common {
 
-    private ConfigService() {}
+    private final Miscs misc;
 
-    public static ConfigService getSingleton() {
-      if (INSTANCE == null) {
-        INSTANCE = new ConfigService();
+    private Common(ForgeConfigSpec.Builder builder) {
+      builder.push("common");
+      {
+        this.misc = new Miscs(builder);
       }
-      return INSTANCE;
+      builder.pop();
+    }
+  }
+
+  public static class Miscs {
+
+    private final ForgeConfigSpec.ConfigValue<String> magicNumberIntroduction;
+    private final ForgeConfigSpec.BooleanValue logDirtBlock;
+    private final ForgeConfigSpec.IntValue magicNumber;
+    // a list of strings that are treated as resource locations for items
+    private final ForgeConfigSpec.ConfigValue<List<? extends String>> itemStrings;
+
+    private Miscs(ForgeConfigSpec.Builder builder) {
+      builder.comment("Other misceallous configurations").push("misc");
+      {
+        this.magicNumberIntroduction = builder
+          .comment("What you want the introduction message to be for the magic number")
+          .define("magicNumberIntroduction", "The magic number is... ");
+        this.logDirtBlock = builder
+          .comment("Whether to log the dirt block on common setup")
+          .define("logDirtBlock", true);
+        this.magicNumber = builder
+          .comment("A magic number")
+          .defineInRange("magicNumber", 42, 0, Integer.MAX_VALUE);
+        this.itemStrings = builder
+          .comment("A list of items to log on common setup.")
+          .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), Miscs::validateItemName);
+      }
+      builder.pop();
     }
 
-    public ForgeConfigSpec getSpec() {
-      return SPEC;
-    }
-
-    public boolean isLogDirtBlock() {
-      return logDirtBlock;
-    }
-
-    public int getMagicNumber() {
-      return magicNumber;
+    private static boolean validateItemName(final Object obj) {
+      return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(
+        ResourceLocation.tryParse(itemName));
     }
 
     public String getMagicNumberIntroduction() {
-      return magicNumberIntroduction;
+      return this.magicNumberIntroduction.get();
     }
 
-    public Set<Item> getItems() {
-      return items;
+    public boolean getLogDirtBlock() {
+      return this.logDirtBlock.get();
+    }
+
+    public int getMagicNumber() {
+      return this.magicNumber.get();
+    }
+
+    public Set<String> getItemStrings() {
+      return this.itemStrings.get()
+        .parallelStream()
+        .collect(Collectors.toSet());
     }
   }
 }

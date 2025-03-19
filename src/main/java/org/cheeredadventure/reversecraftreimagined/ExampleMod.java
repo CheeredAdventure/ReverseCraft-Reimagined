@@ -1,9 +1,11 @@
 package org.cheeredadventure.reversecraftreimagined;
 
 import com.mojang.logging.LogUtils;
+import java.util.Objects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -27,7 +29,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import org.cheeredadventure.reversecraftreimagined.Config.ConfigService;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -67,7 +68,6 @@ public class ExampleMod {
       }).build());
   // Directly reference a slf4j logger
   private static final Logger LOGGER = LogUtils.getLogger();
-  private final ConfigService configService;
 
   public ExampleMod(FMLJavaModLoadingContext context) {
     IEventBus modEventBus = context.getModEventBus();
@@ -88,24 +88,26 @@ public class ExampleMod {
     // Register the item to a creative tab
     modEventBus.addListener(this::addCreative);
 
-    // get singleton instance of ConfigService
-    configService = ConfigService.getSingleton();
-
     // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-    context.registerConfig(ModConfig.Type.COMMON, configService.getSpec());
+    context.registerConfig(ModConfig.Type.COMMON, Config.commonSpec);
   }
 
   private void commonSetup(final FMLCommonSetupEvent event) {
     // Some common setup code
     LOGGER.info("HELLO FROM COMMON SETUP");
 
-      if (configService.isLogDirtBlock()) {
+    if (Config.COMMON.getMisc().getLogDirtBlock()) {
           LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
       }
 
-    LOGGER.info(configService.getMagicNumberIntroduction() + configService.getMagicNumber());
+    LOGGER.info(Config.COMMON.getMisc().getMagicNumberIntroduction() + Config.COMMON.getMisc()
+      .getMagicNumber());
 
-    configService.getItems().forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+    Config.COMMON.getMisc().getItemStrings()
+      .parallelStream()
+      .map(itemString -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(itemString)))
+      .filter(Objects::nonNull)
+      .forEach((item) -> LOGGER.info("ITEM >> {}", item));
   }
 
   // Add the example block item to the building blocks tab

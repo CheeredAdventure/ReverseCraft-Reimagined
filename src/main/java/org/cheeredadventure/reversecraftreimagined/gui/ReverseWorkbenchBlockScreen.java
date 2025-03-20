@@ -3,11 +3,14 @@ package org.cheeredadventure.reversecraftreimagined.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.cheeredadventure.reversecraftreimagined.ReverseCraftReimagined;
+import org.cheeredadventure.reversecraftreimagined.api.PacketHandler;
+import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacket;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -29,6 +32,12 @@ public class ReverseWorkbenchBlockScreen extends
     this.imageWidth = 176;
     this.imageHeight = 207;
 
+    Button reverseButton = Button.builder(Component.literal("Reverse"), button -> {
+      ReverseCraftPacket packet = new ReverseCraftPacket(menu.getResultContainer().getItem(0),
+        inventory.player.blockPosition());
+      PacketHandler.INSTANCE.sendToServer(packet);
+    }).bounds(this.leftPos + 120, this.topPos + 50, 50, 20).build();
+    this.addRenderableWidget(reverseButton);
   }
 
   @Override

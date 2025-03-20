@@ -1,6 +1,7 @@
 package org.cheeredadventure.reversecraftreimagined.gui;
 
 import com.mojang.logging.LogUtils;
+import lombok.Getter;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -21,6 +22,7 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
   private static final int HOTBAR_END = 46;
   private final ContainerLevelAccess access;
   private final SimpleContainer craftingGrid;
+  @Getter
   private final SimpleContainer resultContainer;
 
   public ReverseWorkbenchBlockMenu(int id, Inventory playerInventory, FriendlyByteBuf extraData) {

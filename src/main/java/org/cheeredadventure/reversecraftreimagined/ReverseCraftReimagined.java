@@ -29,7 +29,10 @@ import net.minecraftforge.registries.RegistryObject;
 import org.cheeredadventure.reversecraftreimagined.api.BlockInit;
 import org.cheeredadventure.reversecraftreimagined.api.CreativeTabInit;
 import org.cheeredadventure.reversecraftreimagined.api.ItemInit;
+import org.cheeredadventure.reversecraftreimagined.api.PacketHandler;
 import org.cheeredadventure.reversecraftreimagined.api.RecipeLoader;
+import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacket;
+import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacketHandler;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
 import org.cheeredadventure.reversecraftreimagined.gui.ReverseWorkbenchBlockScreen;
 import org.slf4j.Logger;
@@ -95,6 +98,8 @@ public class ReverseCraftReimagined {
         .map(itemString -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(itemString)))
         .filter(Objects::nonNull)
         .forEach((item) -> LOGGER.info("ITEM >> {}", item));
+
+      PacketHandler.registerPacket(ReverseCraftPacket.class, new ReverseCraftPacketHandler());
     });
   }
 

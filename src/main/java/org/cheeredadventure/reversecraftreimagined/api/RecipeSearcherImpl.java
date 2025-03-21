@@ -3,6 +3,7 @@ package org.cheeredadventure.reversecraftreimagined.api;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 import com.mojang.logging.LogUtils;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -63,10 +64,12 @@ public class RecipeSearcherImpl implements RecipeSearcher {
   public CompletableFuture<Void> writeIndexToJson(Path path) {
     return CompletableFuture.runAsync(() -> {
       try {
-        String json = gson.toJson(outputRecipeMap);
+        String json = gson.toJson(outputRecipeMap, outputRecipeMap.getClass());
         Files.write(path, json.getBytes());
       } catch (IOException e) {
         log.error("Failed to write index to json", e);
+      } catch (JsonIOException e) {
+        log.error("Json related exception has occurred.", e);
       }
     });
   }

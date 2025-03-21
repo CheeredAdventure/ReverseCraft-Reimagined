@@ -3,7 +3,6 @@ package org.cheeredadventure.reversecraftreimagined;
 import com.mojang.logging.LogUtils;
 import java.nio.file.Paths;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.registries.Registries;
@@ -110,16 +109,8 @@ public class ReverseCraftReimagined {
     // Do something when the server starts
     LOGGER.info("HELLO from server starting");
     recipeSearcher = new RecipeSearcherImpl(event.getServer());
-    CompletableFuture.runAsync(recipeSearcher::buildIndex)
-      .thenCombineAsync(recipeSearcher.writeIndexToJson(Paths.get("recipe_index.json")),
-        (r, v) -> null)
-      .whenCompleteAsync((r, t) -> {
-        if (t == null) {
-          LOGGER.info("Recipe index built successfully");
-          return;
-        }
-        LOGGER.error("Error building recipe index", t);
-      });
+    recipeSearcher.buildIndex();
+    recipeSearcher.writeIndexToJson(Paths.get("recipe_index.json"));
   }
 
   // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent

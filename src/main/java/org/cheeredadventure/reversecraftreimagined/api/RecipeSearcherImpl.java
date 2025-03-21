@@ -44,7 +44,7 @@ public class RecipeSearcherImpl implements RecipeSearcher {
 
   @Override
   public List<Recipe<?>> findRecipesByOutput(ItemStack itemStack) {
-    // countermeasures against unlimited proliferation of recipes using damaged items
+    // countermeasures against unlimited proliferation of ingredients using damaged items
     if (itemStack.isDamaged()) {
       return new ArrayList<>();
     }
@@ -59,10 +59,6 @@ public class RecipeSearcherImpl implements RecipeSearcher {
 
   @Override
   public Map<ItemStack, List<Recipe<?>>> findRecipesByIngredient(ItemStack ingredientItemStack) {
-    // countermeasures against unlimited proliferation of recipes using damaged items
-    if (ingredientItemStack.isDamaged()) {
-      return new ConcurrentHashMap<>();
-    }
     Map<ItemStack, List<Recipe<?>>> result = new ConcurrentHashMap<>();
     ingredientRecipeMap.forEach((key, value) -> {
       if (key.is(ingredientItemStack.getItem())) {

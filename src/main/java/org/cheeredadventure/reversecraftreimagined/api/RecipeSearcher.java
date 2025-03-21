@@ -1,7 +1,9 @@
 package org.cheeredadventure.reversecraftreimagined.api;
 
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 
@@ -20,11 +22,7 @@ public interface RecipeSearcher {
    */
   List<Recipe<?>> findRecipesByOutput(ItemStack itemStack);
 
-  /**
-   * finds recipes that have the given itemStack as an ingredient
-   *
-   * @param ingredientItemStack the itemStack to search for
-   * @return a {@link List} of {@link Recipe}s that have the given itemStack as an ingredient
-   */
-  Map<ItemStack, List<Recipe<?>>> findRecipesByIngredient(ItemStack ingredientItemStack);
+  CompletableFuture<Optional<RecipeSearcher>> readIndexFromJson(Path path);
+
+  CompletableFuture<Void> writeIndexToJson(Path path);
 }

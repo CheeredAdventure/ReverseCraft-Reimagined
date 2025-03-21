@@ -1,11 +1,21 @@
 package org.cheeredadventure.reversecraftreimagined.api;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mojang.logging.LogUtils;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
@@ -16,13 +26,15 @@ public class RecipeSearcherImpl implements RecipeSearcher {
 
   private static final Logger log = LogUtils.getLogger();
   private final MinecraftServer server;
+  private final Gson gson;
   private Map<ItemStack, List<Recipe<?>>> outputRecipeMap;
-  private Map<ItemStack, List<Recipe<?>>> ingredientRecipeMap;
 
   public RecipeSearcherImpl(MinecraftServer server) {
     this.server = server;
     this.outputRecipeMap = new ConcurrentHashMap<>();
-    this.ingredientRecipeMap = new ConcurrentHashMap<>();
+    this.gson = new GsonBuilder()
+      .registerTypeAdapterFactory(new OptionalTypeAdapterFactory())
+      .create();
   }
 
   @Override
@@ -33,38 +45,45 @@ public class RecipeSearcherImpl implements RecipeSearcher {
     for (Recipe<?> recipe : recipes) {
       ItemStack output = recipe.getResultItem(this.server.registryAccess());
       outputRecipeMap.computeIfAbsent(output, k -> new ArrayList<>()).add(recipe);
-
-      recipe.getIngredients().forEach(ingredient -> {
-        for (ItemStack itemStack : ingredient.getItems()) {
-          ingredientRecipeMap.computeIfAbsent(itemStack, k -> new ArrayList<>()).add(recipe);
-        }
-      });
     }
   }
 
   @Override
   public List<Recipe<?>> findRecipesByOutput(ItemStack itemStack) {
-    // countermeasures against unlimited proliferation of ingredients using damaged items
     if (itemStack.isDamaged()) {
       return new ArrayList<>();
     }
-    List<Recipe<?>> result = new ArrayList<>();
-    outputRecipeMap.forEach((key, value) -> {
-      if (key.is(itemStack.getItem())) {
-        result.addAll(value);
-      }
-    });
-    return result;
+    return outputRecipeMap.entrySet().stream()
+      .filter(entry -> entry.getKey().is(itemStack.getItem()))
+      .flatMap(entry -> entry.getValue().stream())
+      .collect(Collectors.toList());
   }
 
   @Override
-  public Map<ItemStack, List<Recipe<?>>> findRecipesByIngredient(ItemStack ingredientItemStack) {
-    Map<ItemStack, List<Recipe<?>>> result = new ConcurrentHashMap<>();
-    ingredientRecipeMap.forEach((key, value) -> {
-      if (key.is(ingredientItemStack.getItem())) {
-        result.put(key, value);
+  public CompletableFuture<Void> writeIndexToJson(Path path) {
+    return CompletableFuture.runAsync(() -> {
+      try {
+        String json = gson.toJson(outputRecipeMap);
+        Files.write(path, json.getBytes());
+      } catch (IOException e) {
+        log.error("Failed to write index to json", e);
       }
     });
-    return result;
+  }
+
+  @Override
+  public CompletableFuture<Optional<RecipeSearcher>> readIndexFromJson(Path path) {
+    return CompletableFuture.supplyAsync(() -> {
+      try {
+        String json = new String(Files.readAllBytes(path));
+        Type type = new TypeToken<Map<ItemStack, List<Recipe<?>>>>() {
+        }.getType();
+        outputRecipeMap = gson.fromJson(json, type);
+        return Optional.of(this);
+      } catch (IOException e) {
+        log.error("Failed to read index from json", e);
+        return Optional.empty();
+      }
+    });
   }
 }

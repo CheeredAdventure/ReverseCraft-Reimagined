@@ -3,6 +3,7 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id("org.javamodularity.moduleplugin").version("1.7.0")
 }
 
 version = "${minecraft_version}-${mod_version}"
@@ -158,8 +159,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    // External java libraries that are convienient to use in your mod
-    implementation("org.projectlombok:lombok:1.18.22")
+    // External java libraries that are convenient to use in your mod
+    compileOnly("org.projectlombok:lombok:1.18.22")
     annotationProcessor("org.projectlombok:lombok:1.18.22")
 }
 
@@ -197,13 +198,13 @@ tasks.named('jar', Jar).configure {
     }
 
     // This is the preferred method to reobfuscate your jar file
-    finalizedBy 'reobfJar'
+//    finalizedBy 'reobfJar'
 }
 
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing:
-// tasks.named('publish').configure {
-//     dependsOn 'reobfJar'
-// }
+tasks.named('publish').configure {
+    dependsOn 'reobfJar'
+}
 
 // Example configuration to allow publishing using the maven-publish plugin
 publishing {

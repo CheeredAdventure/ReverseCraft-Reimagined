@@ -1,6 +1,7 @@
 package org.cheeredadventure.reversecraftreimagined;
 
 import com.mojang.logging.LogUtils;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.client.Minecraft;
@@ -110,6 +111,8 @@ public class ReverseCraftReimagined {
     LOGGER.info("HELLO from server starting");
     recipeSearcher = new RecipeSearcherImpl(event.getServer());
     CompletableFuture.runAsync(recipeSearcher::buildIndex)
+      .thenCombineAsync(recipeSearcher.writeIndexToJson(Paths.get("recipe_index.json")),
+        (r, v) -> null)
       .whenCompleteAsync((r, t) -> {
         if (t == null) {
           LOGGER.info("Recipe index built successfully");

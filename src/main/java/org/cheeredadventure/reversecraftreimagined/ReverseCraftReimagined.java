@@ -1,10 +1,8 @@
 package org.cheeredadventure.reversecraftreimagined;
 
 import com.mojang.logging.LogUtils;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.registries.Registries;
@@ -30,7 +28,8 @@ import org.cheeredadventure.reversecraftreimagined.api.BlockInit;
 import org.cheeredadventure.reversecraftreimagined.api.CreativeTabInit;
 import org.cheeredadventure.reversecraftreimagined.api.ItemInit;
 import org.cheeredadventure.reversecraftreimagined.api.PacketHandler;
-import org.cheeredadventure.reversecraftreimagined.api.RecipeLoader;
+import org.cheeredadventure.reversecraftreimagined.api.RecipeSearcher;
+import org.cheeredadventure.reversecraftreimagined.api.RecipeSearcherImpl;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacket;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacketHandler;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
@@ -45,6 +44,7 @@ public class ReverseCraftReimagined {
   public static final String MODID = "reversecraftreimagined";
   private static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS;
   private static final RegistryObject<CreativeModeTab> EXAMPLE_TAB;
+  private static RecipeSearcher recipeSearcher;
 
   static {
     CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
@@ -108,19 +108,15 @@ public class ReverseCraftReimagined {
   public void onServerStarting(ServerStartingEvent event) {
     // Do something when the server starts
     LOGGER.info("HELLO from server starting");
-    CompletableFuture.supplyAsync(event::getServer)
-      .thenApplyAsync(RecipeLoader::new)
-      .thenApplyAsync(RecipeLoader::loadRecipes)
-      .thenApplyAsync(Collection::stream)
-      .thenApplyAsync(Stream::findFirst)
-      .thenAcceptAsync(
-        nullableRecipe -> nullableRecipe.ifPresent(
-          recipe -> LOGGER.info("Recipe loaded: id: {}, artifact: {}", recipe.getId(),
-            recipe.getResultItem(event.getServer().registryAccess()))))
-      .exceptionallyAsync(t -> {
-        LOGGER.error("Error loading recipes", t);
-        return null;
-      }).whenCompleteAsync((r, t) -> LOGGER.trace("Recipe loading complete"));
+    recipeSearcher = new RecipeSearcherImpl(event.getServer());
+    CompletableFuture.runAsync(recipeSearcher::buildIndex)
+      .whenCompleteAsync((r, t) -> {
+        if (t == null) {
+          LOGGER.info("Recipe index built successfully");
+          return;
+        }
+        LOGGER.error("Error building recipe index", t);
+      });
   }
 
   // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent

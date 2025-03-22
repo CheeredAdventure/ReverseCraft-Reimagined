@@ -33,7 +33,8 @@ public class ReverseWorkbenchBlockScreen extends
     this.imageHeight = 207;
 
     Button reverseButton = Button.builder(Component.literal("Reverse"), button -> {
-      ReverseCraftPacket packet = new ReverseCraftPacket(menu.getResultContainer().getItem(0),
+      ReverseCraftPacket packet = new ReverseCraftPacket(
+        menu.getResultContainer().getStackInSlot(0),
         inventory.player.blockPosition());
       PacketHandler.INSTANCE.sendToServer(packet);
     }).bounds(this.leftPos + 120, this.topPos + 50, 50, 20).build();

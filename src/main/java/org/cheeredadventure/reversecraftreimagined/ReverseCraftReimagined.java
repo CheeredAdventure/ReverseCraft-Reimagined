@@ -1,7 +1,6 @@
 package org.cheeredadventure.reversecraftreimagined;
 
 import com.mojang.logging.LogUtils;
-import java.nio.file.Paths;
 import java.util.Objects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -28,8 +27,6 @@ import org.cheeredadventure.reversecraftreimagined.api.BlockInit;
 import org.cheeredadventure.reversecraftreimagined.api.CreativeTabInit;
 import org.cheeredadventure.reversecraftreimagined.api.ItemInit;
 import org.cheeredadventure.reversecraftreimagined.api.PacketHandler;
-import org.cheeredadventure.reversecraftreimagined.api.RecipeSearcher;
-import org.cheeredadventure.reversecraftreimagined.api.RecipeSearcherImpl;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacket;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacketHandler;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
@@ -44,7 +41,6 @@ public class ReverseCraftReimagined {
   public static final String MODID = "reversecraftreimagined";
   private static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS;
   private static final RegistryObject<CreativeModeTab> EXAMPLE_TAB;
-  private static RecipeSearcher recipeSearcher;
 
   static {
     CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
@@ -108,9 +104,6 @@ public class ReverseCraftReimagined {
   public void onServerStarting(ServerStartingEvent event) {
     // Do something when the server starts
     LOGGER.info("HELLO from server starting");
-    recipeSearcher = new RecipeSearcherImpl(event.getServer());
-    recipeSearcher.buildIndex();
-    recipeSearcher.writeIndexToJson(Paths.get("recipe_index.json"));
   }
 
   // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent

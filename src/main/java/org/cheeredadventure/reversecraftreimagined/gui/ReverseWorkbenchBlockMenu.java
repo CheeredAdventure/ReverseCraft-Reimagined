@@ -16,6 +16,7 @@ import net.minecraftforge.items.SlotItemHandler;
 import org.cheeredadventure.reversecraftreimagined.api.BlockInit;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
 import org.cheeredadventure.reversecraftreimagined.blocks.ReverseWorkbenchBlockEntity;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
@@ -70,39 +71,37 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
   }
 
   @Override
-  public ItemStack quickMoveStack(Player player, int i) {
-    Slot sourceSlot = this.slots.get(i);
-    if (sourceSlot == null || !sourceSlot.hasItem()) {
-      return ItemStack.EMPTY;
-    }
-    ItemStack sourceStack = sourceSlot.getItem();
-    ItemStack copyOfSourceStack = sourceStack.copy();
-
-    if (i < VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT) {
-      if (!this.moveItemStackTo(sourceStack, REVERSE_WORKBENCH_SLOT_COUNT,
-        REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX + REVERSE_WORKBENCH_SLOT_COUNT, false)) {
+  public @NotNull ItemStack quickMoveStack(@NotNull Player player, int i) {
+    ItemStack itemstack = ItemStack.EMPTY;
+    Slot slot = this.slots.get(i);
+    if (slot.hasItem()) {
+      ItemStack itemstack1 = slot.getItem();
+      itemstack = itemstack1.copy();
+      if (i < VANILLA_SLOT_COUNT) {
+        if (!this.moveItemStackTo(itemstack1, REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX,
+          REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX + REVERSE_WORKBENCH_SLOT_COUNT, false)) {
+          return ItemStack.EMPTY;
+        }
+      } else if (i < REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX + REVERSE_WORKBENCH_SLOT_COUNT) {
+        if (!this.moveItemStackTo(itemstack1, 0, VANILLA_SLOT_COUNT, false)) {
+          return ItemStack.EMPTY;
+        }
+      }
+      if (itemstack1.isEmpty()) {
+        slot.set(ItemStack.EMPTY);
+      } else {
+        slot.setChanged();
+      }
+      if (itemstack1.getCount() == itemstack.getCount()) {
         return ItemStack.EMPTY;
       }
-    } else if (i < REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX + REVERSE_WORKBENCH_SLOT_COUNT) {
-      if (!this.moveItemStackTo(sourceStack, VANILLA_FIRST_SLOT_INDEX,
-        VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT, false)) {
-        return ItemStack.EMPTY;
-      }
-    } else {
-      log.error("Invalid slotIndex: {}", i);
-      return ItemStack.EMPTY;
+      slot.onTake(player, itemstack1);
     }
-    if (sourceStack.getCount() == 0) {
-      sourceSlot.set(ItemStack.EMPTY);
-    } else {
-      sourceSlot.setChanged();
-    }
-    sourceSlot.onTake(player, sourceStack);
-    return copyOfSourceStack;
+    return itemstack;
   }
 
   @Override
-  public boolean stillValid(Player player) {
+  public boolean stillValid(@NotNull Player player) {
     return stillValid(ContainerLevelAccess.create(this.level, this.blockEntity.getBlockPos()),
       player,
       BlockInit.getREVERSE_WORKBENCH().get());

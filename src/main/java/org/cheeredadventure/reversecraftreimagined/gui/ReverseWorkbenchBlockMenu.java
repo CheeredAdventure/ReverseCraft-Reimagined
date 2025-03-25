@@ -1,7 +1,6 @@
 package org.cheeredadventure.reversecraftreimagined.gui;
 
 import com.mojang.logging.LogUtils;
-import java.io.IOException;
 import java.util.Objects;
 import lombok.Getter;
 import net.minecraft.network.FriendlyByteBuf;
@@ -11,7 +10,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -109,17 +107,5 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
       }
     }
     return newStack;
-  }
-
-  @Override
-  public void removed(@NotNull Player playerIn) {
-    super.removed(playerIn);
-    try (Level level = playerIn.level()) {
-      if (!level.isClientSide()) {
-        this.blockEntity.drops();
-      }
-    } catch (IOException e) {
-      log.error("Error while closing ReverseWorkbenchBlockMenu", e);
-    }
   }
 }

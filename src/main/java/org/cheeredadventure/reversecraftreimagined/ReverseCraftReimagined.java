@@ -29,6 +29,7 @@ import org.cheeredadventure.reversecraftreimagined.api.ItemInit;
 import org.cheeredadventure.reversecraftreimagined.api.PacketHandler;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacket;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacketHandler;
+import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchBlockEntities;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
 import org.cheeredadventure.reversecraftreimagined.gui.ReverseWorkbenchBlockScreen;
 import org.slf4j.Logger;
@@ -68,6 +69,7 @@ public class ReverseCraftReimagined {
     // Register the Deferred Register to the mod event bus so tabs get registered
     CreativeTabInit.TABS.register(modEventBus);
     ReverseWorkbenchMenuTypes.MENU_TYPES.register(modEventBus);
+    ReverseWorkbenchBlockEntities.BLOCK_ENTITIES.register(modEventBus);
 
     // Register ourselves for server and other game events we are interested in
     MinecraftForge.EVENT_BUS.register(this);

@@ -11,13 +11,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.CraftingTableBlock;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 import org.cheeredadventure.reversecraftreimagined.gui.ReverseWorkbenchBlockMenu;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ReverseWorkbench extends CraftingTableBlock {
+public class ReverseWorkbench extends CraftingTableBlock implements EntityBlock {
 
   private static final Component CONTAINER_TITLE = Component.translatable(
     "container.reverseworkbenchcrafting");
@@ -46,5 +49,11 @@ public class ReverseWorkbench extends CraftingTableBlock {
     return new SimpleMenuProvider(
       (id, playerInventory, player) -> new ReverseWorkbenchBlockMenu(id, playerInventory,
         ContainerLevelAccess.create(level, blockPos)), CONTAINER_TITLE);
+  }
+
+  @Nullable
+  @Override
+  public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
+    return new ReverseWorkbenchBlockEntity(blockPos, blockState);
   }
 }

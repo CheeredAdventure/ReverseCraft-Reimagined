@@ -2,6 +2,7 @@ package org.cheeredadventure.reversecraftreimagined.blocks;
 
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
@@ -12,6 +13,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -27,31 +30,19 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
   private final ItemStackHandler inventory = new ItemStackHandler(9 + 1);
   private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
+
   public ReverseWorkbenchBlockEntity(BlockPos pos, BlockState state) {
     super(ReverseWorkbenchBlockEntities.REVERSE_WORKBENCH_BLOCK_ENTITY.get(), pos, state);
   }
 
   @Override
-  @NotNull
-  public Component getDisplayName() {
-    return Component.translatable("container.reverseworkbenchcrafting");
-  }
+  public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap,
+    @Nullable Direction side) {
+    if (cap == ForgeCapabilities.ITEM_HANDLER) {
+      return this.lazyItemHandler.cast();
+    }
 
-  @Override
-  public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-    return new ReverseWorkbenchBlockMenu(i, inventory, this, this.data);
-  }
-
-  @Override
-  protected void saveAdditional(@NotNull CompoundTag tag) {
-    super.saveAdditional(tag);
-    tag.put("inventory", this.inventory.serializeNBT());
-  }
-
-  @Override
-  public void load(@NotNull CompoundTag tag) {
-    super.load(tag);
-    this.inventory.deserializeNBT(tag.getCompound("inventory"));
+    return super.getCapability(cap, side);
   }
 
   @Override
@@ -74,4 +65,28 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
     Containers.dropContents(this.level, this.worldPosition, inventory);
   }
 
+  @Override
+  public @NotNull Component getDisplayName() {
+    return Component.translatable("container.reverseworkbenchcrafting");
+  }
+
+  @Override
+  public @Nullable AbstractContainerMenu createMenu(int i, @NotNull Inventory inventory,
+    @NotNull Player player) {
+    return new ReverseWorkbenchBlockMenu(i, inventory, this);
+  }
+
+  @Override
+  protected void saveAdditional(CompoundTag tag) {
+    tag.put("inventory", this.inventory.serializeNBT());
+    super.saveAdditional(tag);
+  }
+
+  @Override
+  public void load(@NotNull CompoundTag tag) {
+    super.load(tag);
+    this.inventory.deserializeNBT(tag.getCompound("inventory"));
+  }
+
+  // TODO: implement crafting logic
 }

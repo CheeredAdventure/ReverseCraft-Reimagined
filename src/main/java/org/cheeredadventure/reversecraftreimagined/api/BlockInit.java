@@ -1,5 +1,6 @@
 package org.cheeredadventure.reversecraftreimagined.api;
 
+import lombok.Getter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -14,6 +15,7 @@ import org.cheeredadventure.reversecraftreimagined.blocks.ReverseWorkbench;
 public class BlockInit {
 
   public static final DeferredRegister<Block> BLOCKS;
+  @Getter
   static final RegistryObject<Block> REVERSE_WORKBENCH;
 
   static {

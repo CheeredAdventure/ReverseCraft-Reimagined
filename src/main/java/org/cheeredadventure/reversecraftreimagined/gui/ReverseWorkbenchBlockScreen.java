@@ -3,15 +3,12 @@ package org.cheeredadventure.reversecraftreimagined.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.cheeredadventure.reversecraftreimagined.ReverseCraftReimagined;
-import org.cheeredadventure.reversecraftreimagined.api.PacketHandler;
-import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacket;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 public class ReverseWorkbenchBlockScreen extends
@@ -26,39 +23,31 @@ public class ReverseWorkbenchBlockScreen extends
       "textures/gui/reverseworkbench.png");
   }
 
-  public ReverseWorkbenchBlockScreen(ReverseWorkbenchBlockMenu menu, Inventory inventory,
+  public ReverseWorkbenchBlockScreen(ReverseWorkbenchBlockMenu menu, Inventory playerInventory,
     Component title) {
-    super(menu, inventory, title);
-    this.imageWidth = 176;
-    this.imageHeight = 207;
-
-    Button reverseButton = Button.builder(Component.literal("Reverse"), button -> {
-      ReverseCraftPacket packet = new ReverseCraftPacket(
-        menu.getResultContainer().getStackInSlot(0),
-        inventory.player.blockPosition());
-      PacketHandler.INSTANCE.sendToServer(packet);
-    }).bounds(this.leftPos + 120, this.topPos + 50, 50, 20).build();
-    this.addRenderableWidget(reverseButton);
+    super(menu, playerInventory, title);
   }
 
   @Override
   protected void init() {
     super.init();
-    this.leftPos = (this.width - this.imageWidth) / 2;
-    this.topPos = (this.height - this.imageHeight) / 2;
   }
 
   @Override
-  protected void renderBg(@NotNull GuiGraphics guiGraphics, float partialTicks, int x, int y) {
+  protected void renderBg(GuiGraphics guiGraphics, float v, int i, int i1) {
+    RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     RenderSystem.setShaderTexture(0, REVERSE_WORKBENCH_GUI_TEXTURE);
-    guiGraphics.blit(REVERSE_WORKBENCH_GUI_TEXTURE, this.leftPos, this.topPos, 0, 0,
-      this.imageWidth, this.imageHeight);
+    int x = (this.width - this.imageWidth) / 2;
+    int y = (this.height - this.imageHeight) / 2;
+
+    guiGraphics.blit(REVERSE_WORKBENCH_GUI_TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
   }
 
   @Override
-  public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-    this.renderBackground(guiGraphics);
+  public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    renderBackground(guiGraphics);
     super.render(guiGraphics, mouseX, mouseY, partialTicks);
-    this.renderTooltip(guiGraphics, mouseX, mouseY);
+    renderTooltip(guiGraphics, mouseX, mouseY);
   }
 }

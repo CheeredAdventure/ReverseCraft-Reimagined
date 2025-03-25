@@ -35,9 +35,10 @@ public class ReverseWorkbench extends CraftingTableBlock implements EntityBlock 
     @NotNull BlockPos blockPos, @NotNull Player player, @NotNull InteractionHand hand,
     @NotNull BlockHitResult hitResult) {
     if (!level.isClientSide()) {
-      NetworkHooks.openScreen((ServerPlayer) player, new SimpleMenuProvider(
-        (id, playerInventory, playerEntity) -> new ReverseWorkbenchBlockMenu(id, playerInventory,
-          ContainerLevelAccess.create(level, blockPos)), CONTAINER_TITLE), blockPos);
+      NetworkHooks.openScreen(
+        (ServerPlayer) player,
+        this.getMenuProvider(blockState, level, blockPos),
+        blockPos);
     }
     return InteractionResult.SUCCESS;
   }
@@ -48,7 +49,8 @@ public class ReverseWorkbench extends CraftingTableBlock implements EntityBlock 
     @NotNull BlockPos blockPos) {
     return new SimpleMenuProvider(
       (id, playerInventory, player) -> new ReverseWorkbenchBlockMenu(id, playerInventory,
-        ContainerLevelAccess.create(level, blockPos)), CONTAINER_TITLE);
+        ContainerLevelAccess.create(level, blockPos), level.getBlockEntity(blockPos)),
+      CONTAINER_TITLE);
   }
 
   @Nullable

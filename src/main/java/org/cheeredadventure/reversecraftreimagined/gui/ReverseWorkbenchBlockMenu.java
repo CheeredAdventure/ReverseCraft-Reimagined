@@ -2,8 +2,7 @@ package org.cheeredadventure.reversecraftreimagined.gui;
 
 import com.mojang.logging.LogUtils;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,10 +12,11 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
+import org.cheeredadventure.reversecraftreimagined.blocks.ReverseWorkbenchBlockEntity;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -29,19 +29,27 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
   private final IItemHandler craftingGrid;
   @Getter
   private final IItemHandler resultContainer;
+  private final ReverseWorkbenchBlockEntity blockEntity;
 
   public ReverseWorkbenchBlockMenu(int id, Inventory playerInventory, FriendlyByteBuf extraData) {
-    this(id, playerInventory,
+    this(
+      id,
+      playerInventory,
       extraData != null ? ContainerLevelAccess.create(playerInventory.player.level(),
-        extraData.readBlockPos()) : ContainerLevelAccess.NULL);
+        extraData.readBlockPos()) : ContainerLevelAccess.NULL,
+      extraData != null ? playerInventory.player.level().getBlockEntity(extraData.readBlockPos())
+        : null
+    );
   }
 
-  public ReverseWorkbenchBlockMenu(int id, Inventory playerInventory, ContainerLevelAccess access) {
+  public ReverseWorkbenchBlockMenu(int id, Inventory playerInventory, ContainerLevelAccess access,
+    BlockEntity blockEntity) {
     super(ReverseWorkbenchMenuTypes.getReverseWorkbenchMenu().get(), id);
     this.access = access;
+    this.blockEntity = Objects.requireNonNullElse((ReverseWorkbenchBlockEntity) blockEntity, null);
 
     // crafting grid
-    this.craftingGrid = new ItemStackHandler(CRAFTING_GRID_SIZE);
+    this.craftingGrid = this.blockEntity.getInventory();
     for (int row = 0; row < 3; ++row) {
       for (int col = 0; col < 3; ++col) {
         this.addSlot(
@@ -50,8 +58,8 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
     }
 
     // result item slot
-    resultContainer = new ItemStackHandler(1);
-    this.addSlot(new SlotItemHandler(this.resultContainer, 0, 124, 35) {
+    resultContainer = this.blockEntity.getInventory();
+    this.addSlot(new SlotItemHandler(this.resultContainer, 9, 124, 35) {
       @Override
       public boolean mayPlace(ItemStack itemStack) {
         return true;
@@ -108,18 +116,7 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
     super.removed(playerIn);
     try (Level level = playerIn.level()) {
       if (!level.isClientSide()) {
-        List<ItemStack> remainingItems = new ArrayList<>();
-        for (int i = 0; i < CRAFTING_GRID_SIZE; i++) {
-          ItemStack itemStack = this.craftingGrid.getStackInSlot(i);
-          if (!itemStack.isEmpty()) {
-            remainingItems.add(itemStack);
-          }
-        }
-        ItemStack resultStack = this.resultContainer.getStackInSlot(0);
-        if (!resultStack.isEmpty()) {
-          remainingItems.add(resultStack);
-        }
-        remainingItems.forEach(drop -> playerIn.getInventory().add(drop));
+        this.blockEntity.drops();
       }
     } catch (IOException e) {
       log.error("Error while closing ReverseWorkbenchBlockMenu", e);

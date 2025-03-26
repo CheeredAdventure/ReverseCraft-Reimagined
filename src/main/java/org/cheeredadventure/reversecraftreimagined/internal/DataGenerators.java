@@ -41,5 +41,10 @@ public class DataGenerators {
         log.info("Generated recipe for Reverse Workbench");
       }
     });
+
+    generator.addProvider(event.includeServer(),
+      new ReverseCraftLangProvider.ReverseCraftLangUS(generator.getPackOutput()));
+    generator.addProvider(event.includeClient(),
+      new ReverseCraftLangProvider.ReverseCraftLangJP(generator.getPackOutput()));
   }
 }

@@ -4,6 +4,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraftforge.common.data.LanguageProvider;
 import org.cheeredadventure.reversecraftreimagined.ReverseCraftReimagined;
 import org.cheeredadventure.reversecraftreimagined.api.BlockInit;
+import org.cheeredadventure.reversecraftreimagined.api.Helper;
+import org.cheeredadventure.reversecraftreimagined.api.Helper.ComponentType;
 
 public abstract class ReverseCraftLangProvider extends LanguageProvider {
 
@@ -20,7 +22,8 @@ public abstract class ReverseCraftLangProvider extends LanguageProvider {
     @Override
     protected void addTranslations() {
       this.add(BlockInit.getREVERSE_WORKBENCH().get(), "Reverse Workbench");
-      this.add("container.reverseworkbenchcrafting", "Reverse Crafting");
+      this.add(Helper.KeyString.getTranslatableKeyAsString(ComponentType.CONTAINER,
+        "reverseworkbenchcrafting"), "Reverse Crafting");
     }
   }
 
@@ -33,7 +36,8 @@ public abstract class ReverseCraftLangProvider extends LanguageProvider {
     @Override
     protected void addTranslations() {
       this.add(BlockInit.getREVERSE_WORKBENCH().get(), "リバースワークベンチ");
-      this.add("container.reverseworkbenchcrafting", "リバースクラフト");
+      this.add(Helper.KeyString.getTranslatableKeyAsString(ComponentType.CONTAINER,
+        "reverseworkbenchcrafting"), "リバースクラフト");
     }
   }
 }

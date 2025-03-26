@@ -18,6 +18,8 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import org.cheeredadventure.reversecraftreimagined.api.Helper;
+import org.cheeredadventure.reversecraftreimagined.api.Helper.ComponentType;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchBlockEntities;
 import org.cheeredadventure.reversecraftreimagined.gui.ReverseWorkbenchBlockMenu;
 import org.jetbrains.annotations.NotNull;
@@ -67,7 +69,7 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
 
   @Override
   public @NotNull Component getDisplayName() {
-    return Component.translatable("container.reverseworkbenchcrafting");
+    return Helper.KeyString.getTranslatableKey(ComponentType.CONTAINER, "reverseworkbenchcrafting");
   }
 
   @Override

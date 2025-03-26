@@ -3,11 +3,15 @@ package org.cheeredadventure.reversecraftreimagined.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.cheeredadventure.reversecraftreimagined.ReverseCraftReimagined;
 import org.slf4j.Logger;
 
@@ -31,6 +35,20 @@ public class ReverseWorkbenchBlockScreen extends
   @Override
   protected void init() {
     super.init();
+    Button reverseButton = Button.builder(
+        Component.translatable("gui." + ReverseCraftReimagined.MODID + ".reverse"),
+        button -> {
+          final ItemStack resultSlotItemStack = this.menu.getBlockEntity().getInventory()
+            .getStackInSlot(9);
+          final BlockPos blockPos = this.menu.getBlockEntity().getBlockPos();
+          final Player invokedPlayer = this.getMinecraft().player;
+          log.info("Reverse button clicked by {} at position {} to send ItemStack: {}", invokedPlayer,
+            blockPos, resultSlotItemStack);
+          // TODO: this.menu.getBlockEntity().searchForReverseCraftingRecipe(resultSlotItemStack, blockPos, invokedPlayer);
+        })
+      .bounds(this.leftPos + 105, this.topPos + 65, 50, 15)
+      .build();
+    this.addRenderableWidget(reverseButton);
   }
 
   @Override

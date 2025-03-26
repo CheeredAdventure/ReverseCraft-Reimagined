@@ -32,6 +32,7 @@ import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacketHandler
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchBlockEntities;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
 import org.cheeredadventure.reversecraftreimagined.gui.ReverseWorkbenchBlockScreen;
+import org.cheeredadventure.reversecraftreimagined.internal.DataGenerators;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -70,6 +71,7 @@ public class ReverseCraftReimagined {
     CreativeTabInit.TABS.register(modEventBus);
     ReverseWorkbenchMenuTypes.MENU_TYPES.register(modEventBus);
     ReverseWorkbenchBlockEntities.BLOCK_ENTITIES.register(modEventBus);
+    modEventBus.register(DataGenerators.class);
 
     // Register ourselves for server and other game events we are interested in
     MinecraftForge.EVENT_BUS.register(this);

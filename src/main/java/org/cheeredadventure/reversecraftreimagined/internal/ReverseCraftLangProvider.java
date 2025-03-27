@@ -24,6 +24,8 @@ public abstract class ReverseCraftLangProvider extends LanguageProvider {
       this.add(BlockInit.getREVERSE_WORKBENCH().get(), "Reverse Workbench");
       this.add(Helper.KeyString.getTranslatableKeyAsString(ComponentType.CONTAINER,
         "reverseworkbenchcrafting"), "Reverse Crafting");
+      this.add(Helper.KeyString.getTranslatableKeyAsString(ComponentType.GUI, "reverse"),
+        "Reverse");
     }
   }
 
@@ -38,6 +40,8 @@ public abstract class ReverseCraftLangProvider extends LanguageProvider {
       this.add(BlockInit.getREVERSE_WORKBENCH().get(), "リバースワークベンチ");
       this.add(Helper.KeyString.getTranslatableKeyAsString(ComponentType.CONTAINER,
         "reverseworkbenchcrafting"), "リバースクラフト");
+      this.add(Helper.KeyString.getTranslatableKeyAsString(ComponentType.GUI, "reverse"),
+        "リバース");
     }
   }
 }

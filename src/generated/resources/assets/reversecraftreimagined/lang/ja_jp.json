@@ -1,4 +1,5 @@
 {
   "block.reversecraftreimagined.reverseworkbench": "リバースワークベンチ",
-  "container.reversecraftreimagined.reverseworkbenchcrafting": "リバースクラフト"
+  "container.reversecraftreimagined.reverseworkbenchcrafting": "リバースクラフト",
+  "gui.reversecraftreimagined.reverse": "リバース"
 }

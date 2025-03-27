@@ -1,4 +1,5 @@
 {
   "block.reversecraftreimagined.reverseworkbench": "Reverse Workbench",
-  "container.reversecraftreimagined.reverseworkbenchcrafting": "Reverse Crafting"
+  "container.reversecraftreimagined.reverseworkbenchcrafting": "Reverse Crafting",
+  "gui.reversecraftreimagined.reverse": "Reverse"
 }

@@ -13,6 +13,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.cheeredadventure.reversecraftreimagined.ReverseCraftReimagined;
+import org.cheeredadventure.reversecraftreimagined.api.Helper;
+import org.cheeredadventure.reversecraftreimagined.api.Helper.ComponentType;
 import org.slf4j.Logger;
 
 public class ReverseWorkbenchBlockScreen extends
@@ -36,7 +38,7 @@ public class ReverseWorkbenchBlockScreen extends
   protected void init() {
     super.init();
     Button reverseButton = Button.builder(
-        Component.translatable("gui." + ReverseCraftReimagined.MODID + ".reverse"),
+        Helper.KeyString.getTranslatableKey(ComponentType.GUI, "reverse"),
         button -> {
           final ItemStack resultSlotItemStack = this.menu.getBlockEntity().getInventory()
             .getStackInSlot(9);

@@ -1,4 +1,4 @@
-package org.cheeredadventure.reversecraftreimagined.api;
+package org.cheeredadventure.reversecraftreimagined.api.networking;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +16,12 @@ public class PacketHandler {
   private static int packetId = 0;
 
   static {
-    INSTANCE = NetworkRegistry.newSimpleChannel(
-      ResourceLocation.tryBuild(ReverseCraftReimagined.MODID, "main"),
-      () -> PROTOCOL_VERSION,
-      PROTOCOL_VERSION::equals,
-      PROTOCOL_VERSION::equals
-    );
+    INSTANCE = NetworkRegistry.ChannelBuilder
+      .named(ResourceLocation.tryBuild(ReverseCraftReimagined.MODID, "main"))
+      .networkProtocolVersion(() -> PROTOCOL_VERSION)
+      .clientAcceptedVersions(PROTOCOL_VERSION::equals)
+      .serverAcceptedVersions(PROTOCOL_VERSION::equals)
+      .simpleChannel();
   }
 
   public static <T> void registerPacket(Class<T> messageType, IPacketHandler<T> handler) {

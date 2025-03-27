@@ -5,14 +5,16 @@ import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -37,10 +39,14 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
   // 9 slots for crafting grid, 1 slot for result
   private final ItemStackHandler inventory = new ItemStackHandler(9 + 1);
   private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+  private ItemStack[] gridItems = new ItemStack[9];
 
 
   public ReverseWorkbenchBlockEntity(BlockPos pos, BlockState state) {
     super(ReverseWorkbenchBlockEntities.REVERSE_WORKBENCH_BLOCK_ENTITY.get(), pos, state);
+    for (int i = 0; i < 9; i++) {
+      this.gridItems[i] = ItemStack.EMPTY;
+    }
   }
 
   @Override
@@ -73,7 +79,7 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
     Containers.dropContents(this.level, this.worldPosition, inventory);
   }
 
-  public <T extends Recipe<?>> void setDummyItems(T recipe, List<Slot> craftGridSlots) {
+  public <T extends Recipe<?>> void setDummyItems(T recipe) {
     if (recipe instanceof ShapedRecipe shaped) {
       final int width = shaped.getWidth();
       final int height = shaped.getHeight();
@@ -88,7 +94,7 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
           if (ingredient.isEmpty()) {
             continue;
           }
-          craftGridSlots.get(index).set(ingredient.getItems()[0].copy());
+          gridItems[index] = ingredient.getItems()[0].copy();
         }
       }
     } else if (recipe instanceof ShapelessRecipe shapeless) {
@@ -98,11 +104,24 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
         if (ingredient.isEmpty()) {
           continue;
         }
-        craftGridSlots.get(i).set(ingredient.getItems()[0].copy());
+        gridItems[i] = ingredient.getItems()[0].copy();
       }
     } else {
       throw new IllegalArgumentException("Unsupported recipe type: " + recipe.getType());
     }
+    this.setChanged();
+  }
+
+  public void setGridItems(ItemStack[] gridItems) {
+    this.gridItems = gridItems;
+    this.setChanged();
+  }
+
+  public void clearDummyItems() {
+    for (int i = 0; i < 9; i++) {
+      this.gridItems[i] = ItemStack.EMPTY;
+    }
+    this.setChanged();
   }
 
   @Override
@@ -119,6 +138,9 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
   @Override
   protected void saveAdditional(CompoundTag tag) {
     tag.put("inventory", this.inventory.serializeNBT());
+    for (int i = 0; i < 9; i++) {
+      tag.put("gridItem" + i, this.gridItems[i].save(new CompoundTag()));
+    }
     super.saveAdditional(tag);
   }
 
@@ -126,6 +148,26 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
   public void load(@NotNull CompoundTag tag) {
     super.load(tag);
     this.inventory.deserializeNBT(tag.getCompound("inventory"));
+    for (int i = 0; i < 9; i++) {
+      this.gridItems[i] = ItemStack.of(tag.getCompound("gridItem" + i));
+    }
+  }
+
+  @Override
+  public @NotNull CompoundTag getUpdateTag() {
+    CompoundTag tag = new CompoundTag();
+    saveAdditional(tag);
+    return tag;
+  }
+
+  @Override
+  public @Nullable ClientboundBlockEntityDataPacket getUpdatePacket() {
+    return ClientboundBlockEntityDataPacket.create(this);
+  }
+
+  @Override
+  public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+    load(pkt.getTag());
   }
 
   // TODO: implement crafting logic

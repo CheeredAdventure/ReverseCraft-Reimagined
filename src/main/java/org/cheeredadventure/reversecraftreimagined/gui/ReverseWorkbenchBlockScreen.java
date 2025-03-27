@@ -14,8 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import org.cheeredadventure.reversecraftreimagined.ReverseCraftReimagined;
 import org.cheeredadventure.reversecraftreimagined.api.Helper;
 import org.cheeredadventure.reversecraftreimagined.api.Helper.ComponentType;
-import org.cheeredadventure.reversecraftreimagined.api.PacketHandler;
-import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacket;
+import org.cheeredadventure.reversecraftreimagined.api.networking.PacketHandler;
+import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseCraftPacket;
 import org.slf4j.Logger;
 
 public class ReverseWorkbenchBlockScreen extends

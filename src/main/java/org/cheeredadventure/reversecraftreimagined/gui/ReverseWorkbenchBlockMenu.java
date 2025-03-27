@@ -2,7 +2,6 @@ package org.cheeredadventure.reversecraftreimagined.gui;
 
 import com.mojang.logging.LogUtils;
 import lombok.Getter;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -16,10 +15,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 import org.cheeredadventure.reversecraftreimagined.api.BlockInit;
-import org.cheeredadventure.reversecraftreimagined.api.PacketHandler;
-import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacket;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseRecipeSearcher;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
+import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchResultSlotItemHandler;
 import org.cheeredadventure.reversecraftreimagined.blocks.ReverseWorkbenchBlockEntity;
 import org.cheeredadventure.reversecraftreimagined.internal.functionality.ReverseRecipeSearcherImpl;
 import org.jetbrains.annotations.NotNull;
@@ -75,18 +73,11 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
             new SlotItemHandler(IItemhandler, row * 3 + column, 30 + column * 18, 17 + row * 18));
         }
       }
-        this.addSlot(new SlotItemHandler(IItemhandler, 9, 124, 35) {
-          @Override
-          public void setChanged() {
-            ItemStack resultSlotItemStack = this.getItem();
-            if (resultSlotItemStack.isEmpty()) {
-              return;
-            }
-            final BlockPos blockPos = ReverseWorkbenchBlockMenu.this.reverseWorkbenchBlockEntity.getBlockPos();
-            ReverseCraftPacket packet = new ReverseCraftPacket(resultSlotItemStack, blockPos);
-            PacketHandler.INSTANCE.sendToServer(packet);
-          }
-        });
+        this.addSlot(
+          new ReverseWorkbenchResultSlotItemHandler(
+            IItemhandler,
+            this.reverseWorkbenchBlockEntity,
+            this.slots.subList(36, 45)));
     });
   }
 

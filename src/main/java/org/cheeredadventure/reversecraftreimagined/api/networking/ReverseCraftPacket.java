@@ -1,4 +1,4 @@
-package org.cheeredadventure.reversecraftreimagined.api;
+package org.cheeredadventure.reversecraftreimagined.api.networking;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -21,5 +21,4 @@ public class ReverseCraftPacket {
     buffer.writeItem(mayReverseCrafting);
     buffer.writeBlockPos(blockPos);
   }
-
 }

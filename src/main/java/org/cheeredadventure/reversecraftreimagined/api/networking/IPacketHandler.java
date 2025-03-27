@@ -1,4 +1,4 @@
-package org.cheeredadventure.reversecraftreimagined.api;
+package org.cheeredadventure.reversecraftreimagined.api.networking;
 
 import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;

@@ -10,11 +10,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.cheeredadventure.reversecraftreimagined.ReverseCraftReimagined;
 import org.cheeredadventure.reversecraftreimagined.api.Helper;
 import org.cheeredadventure.reversecraftreimagined.api.Helper.ComponentType;
+import org.cheeredadventure.reversecraftreimagined.api.PacketHandler;
+import org.cheeredadventure.reversecraftreimagined.api.ReverseCraftPacket;
 import org.slf4j.Logger;
 
 public class ReverseWorkbenchBlockScreen extends
@@ -40,13 +41,13 @@ public class ReverseWorkbenchBlockScreen extends
     Button reverseButton = Button.builder(
         Helper.KeyString.getTranslatableKey(ComponentType.GUI, "reverse"),
         button -> {
-          final ItemStack resultSlotItemStack = this.menu.getBlockEntity().getInventory()
+          final ItemStack resultSlotItemStack = this.menu.getReverseWorkbenchBlockEntity()
+            .getInventory()
             .getStackInSlot(9);
-          final BlockPos blockPos = this.menu.getBlockEntity().getBlockPos();
-          final Player invokedPlayer = this.getMinecraft().player;
-          log.info("Reverse button clicked by {} at position {} to send ItemStack: {}", invokedPlayer,
-            blockPos, resultSlotItemStack);
-          // TODO: this.menu.getBlockEntity().searchForReverseCraftingRecipe(resultSlotItemStack, blockPos, invokedPlayer);
+          final BlockPos blockPos = this.menu.getReverseWorkbenchBlockEntity().getBlockPos();
+          ReverseCraftPacket packet = new ReverseCraftPacket(resultSlotItemStack, blockPos);
+          log.debug("Sending reverse craft packet to server");
+          PacketHandler.INSTANCE.sendToServer(packet);
         })
       .bounds(this.leftPos + 100, this.topPos + 60, 50, 15)
       .build();

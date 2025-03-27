@@ -1,5 +1,6 @@
 package org.cheeredadventure.reversecraftreimagined.blocks;
 
+import java.util.List;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,6 +12,11 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -65,6 +71,38 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
       inventory.setItem(i, this.inventory.getStackInSlot(i));
     }
     Containers.dropContents(this.level, this.worldPosition, inventory);
+  }
+
+  public <T extends Recipe<?>> void setDummyItems(T recipe, List<Slot> craftGridSlots) {
+    if (recipe instanceof ShapedRecipe shaped) {
+      final int width = shaped.getWidth();
+      final int height = shaped.getHeight();
+      final List<Ingredient> ingredients = shaped.getIngredients();
+      for (int row = 0; row < height; row++) {
+        for (int column = 0; column < width; column++) {
+          final int index = row * width + column;
+          if (index >= ingredients.size()) {
+            continue;
+          }
+          final Ingredient ingredient = ingredients.get(index);
+          if (ingredient.isEmpty()) {
+            continue;
+          }
+          craftGridSlots.get(index).set(ingredient.getItems()[0].copy());
+        }
+      }
+    } else if (recipe instanceof ShapelessRecipe shapeless) {
+      final List<Ingredient> ingredients = shapeless.getIngredients();
+      for (int i = 0; i < ingredients.size(); i++) {
+        final Ingredient ingredient = ingredients.get(i);
+        if (ingredient.isEmpty()) {
+          continue;
+        }
+        craftGridSlots.get(i).set(ingredient.getItems()[0].copy());
+      }
+    } else {
+      throw new IllegalArgumentException("Unsupported recipe type: " + recipe.getType());
+    }
   }
 
   @Override

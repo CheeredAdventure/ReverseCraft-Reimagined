@@ -1,6 +1,7 @@
 package org.cheeredadventure.reversecraftreimagined.internal;
 
 import net.minecraft.data.DataGenerator;
+import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -19,5 +20,9 @@ public class DataGenerators {
       new ReverseCraftLangProvider.ReverseCraftLangUS(generator.getPackOutput()));
     generator.addProvider(event.includeClient(),
       new ReverseCraftLangProvider.ReverseCraftLangJP(generator.getPackOutput()));
+
+    ExistingFileHelper fileHelper = event.getExistingFileHelper();
+    generator.addProvider(event.includeClient(),
+      new ReverseWorkbenchBlockStateProvider(generator.getPackOutput(), fileHelper));
   }
 }

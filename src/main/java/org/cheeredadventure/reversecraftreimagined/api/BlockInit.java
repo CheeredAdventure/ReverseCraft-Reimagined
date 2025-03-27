@@ -3,6 +3,7 @@ package org.cheeredadventure.reversecraftreimagined.api;
 import lombok.Getter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -23,8 +24,9 @@ public class BlockInit {
 
     REVERSE_WORKBENCH = BLOCKS.register("reverseworkbench",
       () -> new ReverseWorkbench(BlockBehaviour.Properties.copy(Blocks.CRAFTING_TABLE)
+        .sound(SoundType.WOOD)
         .mapColor(MapColor.WOOD)
-        .strength(1.5F)
+        .strength(2.0F)
         .pushReaction(PushReaction.IGNORE)
       ));
   }

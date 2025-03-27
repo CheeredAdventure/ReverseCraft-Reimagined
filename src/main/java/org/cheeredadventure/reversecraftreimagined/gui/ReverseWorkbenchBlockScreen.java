@@ -48,7 +48,7 @@ public class ReverseWorkbenchBlockScreen extends
             blockPos, resultSlotItemStack);
           // TODO: this.menu.getBlockEntity().searchForReverseCraftingRecipe(resultSlotItemStack, blockPos, invokedPlayer);
         })
-      .bounds(this.leftPos + 105, this.topPos + 65, 50, 15)
+      .bounds(this.leftPos + 100, this.topPos + 60, 50, 15)
       .build();
     this.addRenderableWidget(reverseButton);
   }

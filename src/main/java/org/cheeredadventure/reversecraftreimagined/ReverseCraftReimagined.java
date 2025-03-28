@@ -31,6 +31,12 @@ import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes
 import org.cheeredadventure.reversecraftreimagined.api.networking.PacketHandler;
 import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseCraftPacket;
 import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseCraftPacketHandler;
+import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipeClearGridClientPacket;
+import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipeClearGridClientPacketHandler;
+import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipeClearGridPacket;
+import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipeClearGridPacketHandler;
+import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipePacket;
+import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipePacketHandler;
 import org.cheeredadventure.reversecraftreimagined.gui.ReverseWorkbenchBlockScreen;
 import org.cheeredadventure.reversecraftreimagined.internal.DataGenerators;
 import org.slf4j.Logger;
@@ -100,6 +106,11 @@ public class ReverseCraftReimagined {
         .forEach((item) -> LOGGER.info("ITEM >> {}", item));
 
       PacketHandler.registerPacket(ReverseCraftPacket.class, new ReverseCraftPacketHandler());
+      PacketHandler.registerPacket(ReverseRecipePacket.class, new ReverseRecipePacketHandler());
+      PacketHandler.registerPacket(ReverseRecipeClearGridPacket.class,
+        new ReverseRecipeClearGridPacketHandler());
+      PacketHandler.registerPacket(ReverseRecipeClearGridClientPacket.class,
+        new ReverseRecipeClearGridClientPacketHandler());
     });
   }
 

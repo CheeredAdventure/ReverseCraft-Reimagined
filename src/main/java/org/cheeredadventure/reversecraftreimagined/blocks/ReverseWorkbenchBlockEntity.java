@@ -14,6 +14,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -79,7 +80,7 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
     Containers.dropContents(this.level, this.worldPosition, inventory);
   }
 
-  public <T extends Recipe<?>> void setDummyItems(T recipe) {
+  public <T extends Recipe<?>> void setDummyItems(T recipe, List<Slot> craftGridSlots) {
     if (recipe instanceof ShapedRecipe shaped) {
       final int width = shaped.getWidth();
       final int height = shaped.getHeight();
@@ -94,7 +95,8 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
           if (ingredient.isEmpty()) {
             continue;
           }
-          gridItems[index] = ingredient.getItems()[0].copy();
+          final ItemStack item = ingredient.getItems()[0].copy();
+          craftGridSlots.get(index).set(item);
         }
       }
     } else if (recipe instanceof ShapelessRecipe shapeless) {
@@ -104,7 +106,8 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
         if (ingredient.isEmpty()) {
           continue;
         }
-        gridItems[i] = ingredient.getItems()[0].copy();
+        final ItemStack item = ingredient.getItems()[0].copy();
+        craftGridSlots.get(i).set(item);
       }
     } else {
       throw new IllegalArgumentException("Unsupported recipe type: " + recipe.getType());
@@ -114,13 +117,6 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
 
   public void setGridItems(ItemStack[] gridItems) {
     this.gridItems = gridItems;
-    this.setChanged();
-  }
-
-  public void clearDummyItems() {
-    for (int i = 0; i < 9; i++) {
-      this.gridItems[i] = ItemStack.EMPTY;
-    }
     this.setChanged();
   }
 

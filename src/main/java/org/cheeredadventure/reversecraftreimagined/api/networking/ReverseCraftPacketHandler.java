@@ -8,8 +8,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseRecipeSearcher;
 import org.cheeredadventure.reversecraftreimagined.blocks.ReverseWorkbenchBlockEntity;
 import org.cheeredadventure.reversecraftreimagined.internal.functionality.ReverseRecipeSearcherImpl;
@@ -52,6 +55,17 @@ public class ReverseCraftPacketHandler implements IPacketHandler<ReverseCraftPac
       if (recipes.isEmpty()) {
         log.info("No recipe found for target item: {}", targetItem);
         return;
+      }
+
+      CraftingRecipe recipe = recipes.get(0);
+      if (recipe instanceof ShapedRecipe shaped) {
+        List<ItemStack> ingredients = shaped.getIngredients().stream().map(Ingredient::getItems)
+          .map(itemStacks -> itemStacks[0]).toList();
+        int recipeWidth = shaped.getRecipeWidth();
+        int recipeHeight = shaped.getRecipeHeight();
+        ReverseRecipePacket packet = new ReverseRecipePacket(ingredients, recipeWidth,
+          recipeHeight);
+        PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
       }
 
       log.info("Found {} recipes for target item: {}", recipes.size(), targetItem);

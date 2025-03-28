@@ -1,25 +1,27 @@
 package org.cheeredadventure.reversecraftreimagined.gui;
 
 import com.mojang.logging.LogUtils;
+import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 import org.cheeredadventure.reversecraftreimagined.api.BlockInit;
-import org.cheeredadventure.reversecraftreimagined.api.ReverseRecipeSearcher;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchResultSlotItemHandler;
 import org.cheeredadventure.reversecraftreimagined.blocks.ReverseWorkbenchBlockEntity;
-import org.cheeredadventure.reversecraftreimagined.internal.functionality.ReverseRecipeSearcherImpl;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -48,7 +50,6 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
   static final int REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX =
     VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
   private final Level level;
-  private final ReverseRecipeSearcher<CraftingRecipe> reverseRecipeSearcher;
 
   public ReverseWorkbenchBlockMenu(int id, Inventory playerInventory, FriendlyByteBuf extraData) {
     this(id, playerInventory,
@@ -60,7 +61,6 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
     checkContainerSize(playerInventory, 10);
     this.reverseWorkbenchBlockEntity = (ReverseWorkbenchBlockEntity) blockEntity;
     this.level = playerInventory.player.level();
-    this.reverseRecipeSearcher = new ReverseRecipeSearcherImpl();
 
     addPlayerInventory(playerInventory);
     addPlayerHotbar(playerInventory);
@@ -79,6 +79,33 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
             this.reverseWorkbenchBlockEntity,
             this.slots.subList(36, 45)));
     });
+  }
+
+  public static void displayDummyItems(List<ItemStack> ingredients, int width, int height) {
+    ReverseWorkbenchBlockMenu menu = (ReverseWorkbenchBlockMenu) Objects.requireNonNull(
+      Minecraft.getInstance().player).containerMenu;
+    List<Slot> craftGridSlots = menu.slots.subList(36, 45);
+    for (int row = 0; row < height; row++) {
+      for (int column = 0; column < width; column++) {
+        final int index = row * width + column;
+        final int craftGridIndex = row * 3 + column;
+        if (index >= ingredients.size()) {
+          continue;
+        }
+        ItemStack itemStack = ingredients.get(index);
+        Slot slot = craftGridSlots.get(craftGridIndex);
+        slot.set(itemStack);
+      }
+    }
+  }
+
+  public static void clearDummyItems() {
+    ReverseWorkbenchBlockMenu menu = (ReverseWorkbenchBlockMenu) Objects.requireNonNull(
+      Minecraft.getInstance().player).containerMenu;
+    List<Slot> craftGridSlots = menu.slots.subList(36, 45);
+    for (Slot craftGridSlot : craftGridSlots) {
+      craftGridSlot.set(ItemStack.EMPTY);
+    }
   }
 
   @Override
@@ -130,6 +157,17 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
   private void addPlayerHotbar(Inventory inventory) {
     for (int row = 0; row < 9; ++row) {
       this.addSlot(new Slot(inventory, row, 8 + row * 18, 142));
+    }
+  }
+
+  @RequiredArgsConstructor
+  private static class DummyInventory extends SimpleContainer {
+
+    private final ItemStack[] items;
+
+    @Override
+    public ItemStack getItem(int index) {
+      return items[index];
     }
   }
 }

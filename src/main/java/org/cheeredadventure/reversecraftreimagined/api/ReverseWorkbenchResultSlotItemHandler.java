@@ -33,7 +33,6 @@ public class ReverseWorkbenchResultSlotItemHandler extends SlotItemHandler {
   public void setChanged() {
     final ItemStack itemStack = this.getItem();
     if (itemStack.isEmpty()) {
-      log.debug("ItemStack is empty, clearing grid");
       ReverseRecipeClearGridPacket packet = new ReverseRecipeClearGridPacket(this.blockPos);
       PacketHandler.INSTANCE.sendToServer(packet);
       super.setChanged();

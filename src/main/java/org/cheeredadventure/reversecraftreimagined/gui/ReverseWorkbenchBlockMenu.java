@@ -97,6 +97,9 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
         slot.set(itemStack);
       }
     }
+    for (Slot craftGridSlot : craftGridSlots) {
+      craftGridSlot.setChanged();
+    }
   }
 
   public static void clearDummyItems() {
@@ -105,6 +108,9 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
     List<Slot> craftGridSlots = menu.slots.subList(36, 45);
     for (Slot craftGridSlot : craftGridSlots) {
       craftGridSlot.set(ItemStack.EMPTY);
+    }
+    for (Slot craftGridSlot : craftGridSlots) {
+      craftGridSlot.setChanged();
     }
   }
 

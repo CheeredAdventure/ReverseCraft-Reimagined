@@ -1,6 +1,7 @@
 package org.cheeredadventure.reversecraftreimagined.api.networking;
 
 import com.mojang.logging.LogUtils;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
@@ -59,8 +60,11 @@ public class ReverseCraftPacketHandler implements IPacketHandler<ReverseCraftPac
 
       CraftingRecipe recipe = recipes.get(0);
       if (recipe instanceof ShapedRecipe shaped) {
-        List<ItemStack> ingredients = shaped.getIngredients().stream().map(Ingredient::getItems)
-          .map(itemStacks -> itemStacks[0]).toList();
+        List<ItemStack> ingredients = shaped.getIngredients().stream()
+          .map(Ingredient::getItems)
+          .map(Arrays::asList)
+          .map(itemStacks -> itemStacks.get(0))
+          .toList();
         int recipeWidth = shaped.getRecipeWidth();
         int recipeHeight = shaped.getRecipeHeight();
         ReverseRecipePacket packet = new ReverseRecipePacket(ingredients, recipeWidth,

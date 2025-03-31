@@ -3,11 +3,13 @@ package org.cheeredadventure.reversecraftreimagined.api;
 import com.mojang.logging.LogUtils;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import org.cheeredadventure.reversecraftreimagined.api.crates.InventoryItemRecord;
 import org.cheeredadventure.reversecraftreimagined.api.networking.PacketHandler;
 import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseCraftPacket;
 import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipeClearGridPacket;
@@ -38,6 +40,8 @@ public class ReverseWorkbenchResultSlotItemHandler extends SlotItemHandler {
       super.setChanged();
       return;
     }
+    InventoryItemRecord record = new InventoryItemRecord(Helper.Registries.getItemResourceLocation(
+      itemStack.getItem()).map(ResourceLocation::toString).orElse(""), itemStack.getCount());
     ReverseCraftPacket packet = new ReverseCraftPacket(itemStack, this.blockPos);
     PacketHandler.INSTANCE.sendToServer(packet);
     super.setChanged();

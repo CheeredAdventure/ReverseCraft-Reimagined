@@ -67,6 +67,12 @@ public class ReversalRecipe {
     }
 
     public ReversalRecipe build() {
+      if (this.ingredients == null) {
+        convertPatternsToIngredients();
+      }
+      if (this.patterns == null && this.patternChars == null) {
+        throw new IllegalStateException("No patterns or ingredients set");
+      }
       return new ReversalRecipe(ingredients, result, isShaped);
     }
 
@@ -74,15 +80,14 @@ public class ReversalRecipe {
       if (this.patterns == null || this.patternChars == null) {
         return;
       }
-      this.ingredients = new InventoryItemRecord[this.patterns.size()][];
-      for (int i = 0; i < this.patterns.size(); i++) {
-        String pattern = this.patterns.get(i);
-        this.ingredients[i] = new InventoryItemRecord[pattern.length()];
-        for (int j = 0; j < pattern.length(); j++) {
-          char character = pattern.charAt(j);
+      this.ingredients = new InventoryItemRecord[3][3];
+      for (int i = 0; i < 3; i++) {
+        String pattern = i < this.patterns.size() ? this.patterns.get(i) : "";
+        for (int j = 0; j < 3; j++) {
+          char character = j < pattern.length() ? pattern.charAt(j) : ' ';
           InventoryItemRecord itemRecord = this.patternChars.get(character);
-          this.ingredients[i][j] = Objects.requireNonNullElseGet(itemRecord,
-            () -> new InventoryItemRecord(""));
+          this.ingredients[i][j] = Objects.requireNonNullElseGet(
+            itemRecord, InventoryItemRecord::empty);
         }
       }
     }

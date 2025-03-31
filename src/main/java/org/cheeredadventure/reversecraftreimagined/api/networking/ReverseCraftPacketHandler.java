@@ -46,7 +46,7 @@ public class ReverseCraftPacketHandler implements IPacketHandler<ReverseCraftPac
       log.debug("blockPos: {}", blockPos);
 
       BlockEntity entity = player.level().getBlockEntity(blockPos);
-      if (!(entity instanceof ReverseWorkbenchBlockEntity reverseWorkbenchBlockEntity)) {
+      if (!(entity instanceof ReverseWorkbenchBlockEntity)) {
         log.warn("our ReverseWorkbenchBlockEntity is missing!");
         return;
       }

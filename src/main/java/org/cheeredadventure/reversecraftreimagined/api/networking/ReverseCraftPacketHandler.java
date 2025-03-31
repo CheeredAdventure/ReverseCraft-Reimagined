@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
@@ -62,6 +63,14 @@ public class ReverseCraftPacketHandler implements IPacketHandler<ReverseCraftPac
         List<Ingredient> ingredients = shaped.getIngredients();
         int recipeWidth = shaped.getRecipeWidth();
         int recipeHeight = shaped.getRecipeHeight();
+        ReverseRecipePacket packet = new ReverseRecipePacket(ingredients, recipeWidth,
+          recipeHeight);
+        PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
+      } else if (recipe instanceof ShapelessRecipe shapeless) {
+        List<Ingredient> ingredients = shapeless.getIngredients();
+        final int recipeMaxItemCount = shapeless.getIngredients().size();
+        final int recipeWidth = Math.min(recipeMaxItemCount, 3);
+        final int recipeHeight = recipeMaxItemCount > 3 ? recipeMaxItemCount / 3 : 1;
         ReverseRecipePacket packet = new ReverseRecipePacket(ingredients, recipeWidth,
           recipeHeight);
         PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);

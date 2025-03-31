@@ -58,23 +58,24 @@ public class ReverseCraftPacketHandler implements IPacketHandler<ReverseCraftPac
         return;
       }
 
+      // TODO: implement a way to handle multiple recipes
       CraftingRecipe recipe = recipes.get(0);
+      List<Ingredient> ingredients = recipe.getIngredients();
+      int recipeWidth, recipeHeight;
       if (recipe instanceof ShapedRecipe shaped) {
-        List<Ingredient> ingredients = shaped.getIngredients();
-        int recipeWidth = shaped.getRecipeWidth();
-        int recipeHeight = shaped.getRecipeHeight();
-        ReverseRecipePacket packet = new ReverseRecipePacket(ingredients, recipeWidth,
-          recipeHeight);
-        PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
+        recipeWidth = shaped.getRecipeWidth();
+        recipeHeight = shaped.getRecipeHeight();
       } else if (recipe instanceof ShapelessRecipe shapeless) {
-        List<Ingredient> ingredients = shapeless.getIngredients();
         final int recipeMaxItemCount = shapeless.getIngredients().size();
-        final int recipeWidth = Math.min(recipeMaxItemCount, 3);
-        final int recipeHeight = recipeMaxItemCount > 3 ? recipeMaxItemCount / 3 : 1;
-        ReverseRecipePacket packet = new ReverseRecipePacket(ingredients, recipeWidth,
-          recipeHeight);
-        PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
+        // Configure the number of material items, such as 3x1 + 2, 3x2 + 1, 3x3, as the width and height of the recipe grid.
+        recipeWidth = Math.min(recipeMaxItemCount, 3);
+        recipeHeight = recipeMaxItemCount > 3 ? recipeMaxItemCount / 3 : 1;
+      } else {
+        log.error("Unknown recipe type: {}", recipe.getClass().getName());
+        return;
       }
+      ReverseRecipePacket packet = new ReverseRecipePacket(ingredients, recipeWidth, recipeHeight);
+      PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
 
       log.info("Found {} recipes for target item: {}", recipes.size(), targetItem);
       recipes.forEach(r -> log.debug("Found ingredients: {}", r.getIngredients()));

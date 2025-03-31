@@ -35,7 +35,7 @@ public class ReversingWorkPacketHandler implements IPacketHandler<ReversingWorkP
       final BlockPos blockPos = msg.getBlockPos();
 
       BlockEntity entity = player.level().getBlockEntity(blockPos);
-      if (!(entity instanceof ReverseWorkbenchBlockEntity)) {
+      if (!(entity instanceof ReverseWorkbenchBlockEntity reverseWorkbenchBlockEntity)) {
         log.warn("our ReverseWorkbenchBlockEntity is missing!");
         return;
       }
@@ -49,9 +49,11 @@ public class ReversingWorkPacketHandler implements IPacketHandler<ReversingWorkP
           continue;
         }
         ItemStack copy = ingredient.copy();
+        ingredient.shrink(ingredient.getCount());
         copy.setCount(1);
         player.getInventory().add(copy);
       }
+      reverseWorkbenchBlockEntity.getInventory().setStackInSlot(9, ItemStack.EMPTY);
     });
     ctx.get().setPacketHandled(true);
   }

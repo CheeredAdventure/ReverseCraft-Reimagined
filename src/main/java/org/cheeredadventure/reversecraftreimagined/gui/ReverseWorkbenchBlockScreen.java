@@ -3,6 +3,7 @@ package org.cheeredadventure.reversecraftreimagined.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import java.util.List;
+import java.util.stream.Collectors;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -49,16 +50,22 @@ public class ReverseWorkbenchBlockScreen extends
           if (resultSlotItemStack.isEmpty()) {
             return;
           }
-          final List<ItemStack> ingredients = this.menu.slots.subList(36, 45)
+
+          final List<Slot> slots = this.menu.slots.subList(36, 46);
+          final List<ItemStack> ingredients = slots
             .stream()
+            // first 9 slots are the crafting grid
+            .limit(9)
             .map(Slot::getItem)
-            .filter(itemStack -> !itemStack.isEmpty())
-            .toList();
+            .collect(Collectors.toList());
+
+          ingredients.removeIf(ItemStack::isEmpty);
+
           final BlockPos blockPos = this.menu.getReverseWorkbenchBlockEntity().getBlockPos();
           ReversingWorkPacket packet = new ReversingWorkPacket(ingredients,
             resultSlotItemStack, blockPos);
           PacketHandler.INSTANCE.sendToServer(packet);
-          List<Slot> slots = this.menu.slots.subList(36, 46);
+
           slots.forEach(slot -> slot.set(ItemStack.EMPTY));
           slots.forEach(Slot::setChanged);
         })

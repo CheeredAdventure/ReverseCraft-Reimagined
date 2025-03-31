@@ -2,6 +2,7 @@ package org.cheeredadventure.reversecraftreimagined.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
+import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -10,12 +11,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.cheeredadventure.reversecraftreimagined.ReverseCraftReimagined;
-import org.cheeredadventure.reversecraftreimagined.api.Helper;
 import org.cheeredadventure.reversecraftreimagined.api.Helper.ComponentType;
+import org.cheeredadventure.reversecraftreimagined.api.Helper.KeyString;
 import org.cheeredadventure.reversecraftreimagined.api.networking.PacketHandler;
-import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseCraftPacket;
+import org.cheeredadventure.reversecraftreimagined.api.networking.ReversingWorkPacket;
 import org.slf4j.Logger;
 
 public class ReverseWorkbenchBlockScreen extends
@@ -39,15 +41,26 @@ public class ReverseWorkbenchBlockScreen extends
   protected void init() {
     super.init();
     Button reverseButton = Button.builder(
-        Helper.KeyString.getTranslatableKey(ComponentType.GUI, "reverse"),
+        KeyString.getTranslatableKey(ComponentType.GUI, "reverse"),
         button -> {
           final ItemStack resultSlotItemStack = this.menu.getReverseWorkbenchBlockEntity()
             .getInventory()
             .getStackInSlot(9);
+          if (resultSlotItemStack.isEmpty()) {
+            return;
+          }
+          final List<ItemStack> ingredients = this.menu.slots.subList(36, 45)
+            .stream()
+            .map(Slot::getItem)
+            .filter(itemStack -> !itemStack.isEmpty())
+            .toList();
           final BlockPos blockPos = this.menu.getReverseWorkbenchBlockEntity().getBlockPos();
-          ReverseCraftPacket packet = new ReverseCraftPacket(resultSlotItemStack, blockPos);
-          log.debug("Sending reverse craft packet to server");
+          ReversingWorkPacket packet = new ReversingWorkPacket(ingredients,
+            resultSlotItemStack, blockPos);
           PacketHandler.INSTANCE.sendToServer(packet);
+          List<Slot> slots = this.menu.slots.subList(36, 46);
+          slots.forEach(slot -> slot.set(ItemStack.EMPTY));
+          slots.forEach(Slot::setChanged);
         })
       .bounds(this.leftPos + 100, this.topPos + 60, 50, 15)
       .build();

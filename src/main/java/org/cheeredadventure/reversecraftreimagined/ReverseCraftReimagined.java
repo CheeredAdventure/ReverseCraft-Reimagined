@@ -37,6 +37,8 @@ import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipeC
 import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipeClearGridPacketHandler;
 import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipePacket;
 import org.cheeredadventure.reversecraftreimagined.api.networking.ReverseRecipePacketHandler;
+import org.cheeredadventure.reversecraftreimagined.api.networking.ReversingWorkPacket;
+import org.cheeredadventure.reversecraftreimagined.api.networking.ReversingWorkPacketHandler;
 import org.cheeredadventure.reversecraftreimagined.gui.ReverseWorkbenchBlockScreen;
 import org.cheeredadventure.reversecraftreimagined.internal.DataGenerators;
 import org.slf4j.Logger;
@@ -111,6 +113,7 @@ public class ReverseCraftReimagined {
         new ReverseRecipeClearGridPacketHandler());
       PacketHandler.registerPacket(ReverseRecipeClearGridClientPacket.class,
         new ReverseRecipeClearGridClientPacketHandler());
+      PacketHandler.registerPacket(ReversingWorkPacket.class, new ReversingWorkPacketHandler());
     });
   }
 

@@ -1,0 +1,79 @@
+name: Bug report 🐛
+description: Found a bug? Help us beat it!
+assignees:
+  - hizumiaoba
+labels:
+  - bug
+  - investigating
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Keep in your mind that this is not a place for making questions.
+        
+        Please head to [Discussions](https://github.com/CheeredAdventure/ReverseCraft-Reimagined/discussions/new/choose) for general questions for this mod.
+  - type: dropdown
+    attributes:
+      label: minecraft version
+      description: |
+        Select the version of Minecraft you are playing.
+        
+        Note that MC version that is not on the list is not officially supported.
+      options:
+        - 1.20.1
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: crash report
+      description: If you have a crash report, please paste it here. Leave blank if you don't have one.
+      render: plaintext
+      placeholder: |
+        ---- Minecraft Crash Report ----
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: bug description
+      description: |
+        Please provide a detailed, concise description of what you were experiencing.
+      placeholder: |
+        I was doing ~~~ with ~~~, and then my game got crashed.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: steps to reproduce
+      description: |
+        Please provide a minimal, detailed steps to reproduce your bug.
+        
+        If you are not sure how to reproduce the bug, please provide as much information as possible about what you were doing when the bug occurred.
+      placeholder: |
+        1. Do this
+        2. Do that
+        3. Ka-boom!
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: expected behavior
+      description: |
+        Please provide a detail of what you expected to happen.
+        
+        If you are not sure what you expected, please provide as much information as possible about what you had wanted to do.
+      placeholder: |
+        My items should be in my inventory./My game won't be crashed.
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: final submission check
+      description: |
+        Check the boxes below to confirm that you have done the following:
+      options:
+        - label: I have checked the existing issues to see if this bug has already been reported.
+          required: true
+        - label: I have checked the existing PRs to see if this bug has already been fixed.
+          required: true
+        - label: I'm very sure that it is a this mod's bug, not a Minecraft bug or another mod's bug.
+          required: true

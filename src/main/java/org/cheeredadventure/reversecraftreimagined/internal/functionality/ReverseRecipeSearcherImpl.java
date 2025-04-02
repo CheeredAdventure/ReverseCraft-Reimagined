@@ -30,8 +30,11 @@ public class ReverseRecipeSearcherImpl implements ReverseRecipeSearcher<Crafting
 
     RecipeManager recipeManager = server.getRecipeManager();
     List<CraftingRecipe> recipes = recipeManager.getAllRecipesFor(RecipeType.CRAFTING);
-    return recipes.stream().filter(
-      recipe -> recipe.getResultItem(server.registryAccess())
-        .is(resultItem.getItem())).toList();
+    return recipes.stream()
+      .filter(recipe -> recipe.getResultItem(server.registryAccess())
+        .is(resultItem.getItem()))
+      .filter(recipe -> recipe.getResultItem(server.registryAccess())
+        .getCount() == resultItem.getCount())
+      .toList();
   }
 }

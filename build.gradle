@@ -220,6 +220,22 @@ publishing {
     }
 }
 
+tasks.register('snapshot') {
+    group = 'build'
+    description = 'Builds a snapshot with the current HEAD hash'
+    dependsOn 'build'
+    doLast {
+        def commitHash = 'git rev-parse --short HEAD'.execute().text.trim()
+        def snapshotVersion = "${mod_version}-${commitHash}"
+        println "Taking snapshot of ${project.name} at ${commitHash}"
+        // rename the jar file to include the commit hash
+        def jarFile = tasks.jar.archiveFile.get().asFile
+        def newJarFile = new File(jarFile.parent, "${jarFile.name.replace(mod_version, snapshotVersion)}")
+        jarFile.renameTo(newJarFile)
+        println "Renamed jar file to ${newJarFile.name}"
+    }
+}
+
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }

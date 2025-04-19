@@ -52,7 +52,8 @@ To contribute to this project, you will need the following tools:
   - Follow [Google's coding style](https://google.github.io/styleguide/jsguide.html) for Java code.
   - Adjust your IDE's formatter settings to match the project's style if necessary.
 
-> Note: line length setting is optional in this project. project master enforces paticular line length specified by coding style,
+> Note: line length setting is optional in this project. project master enforces particular line
+> length specified by coding style,
 > but it is not required for contributors.
 
 - **Comments**:  
@@ -65,7 +66,8 @@ To contribute to this project, you will need the following tools:
   - Constants: `UPPER_SNAKE_CASE`
     - **Exception**: `org.slf4j.Logger` instance is usually a `private static final` constant. but we treat it as normal static field, thus it is `lowerCamelCase`.
 
-There is no paticular rules for naming variables. Your variables should be named in a way that makes sense to you and your code!
+There is no particular rules for naming variables. Your variables should be named in a way that
+makes sense to you and your code!
 
 ---
 
@@ -99,28 +101,28 @@ There is no paticular rules for naming variables. Your variables should be named
 
 ## Fixing Bugs
 
-1. **Check Existing Issues**  
+1. **Check Existing Issues**:
    Verify if the bug has already been reported in the [Issues](https://github.com/CheeredAdventure/ReverseCraft-Reimagined/issues) section.
 
-2. **Create a New Branch**  
+2. **Create a New Branch**:
    Create a branch for the bug fix:
    ```bash
    git checkout -b bugfix/<issue-id>
    ```
 
-3. **Implement the Fix**  
+3. **Implement the fix**:
    Fix the bug and verify the changes.
 
-4. **Update or Add Tests**  
+4. **Update or Add Tests**:
    Add or update test cases to cover the bug fix.
 
-5. **Commit Your Changes**  
+5. **Commit Your Changes**:
    Use meaningful commit messages:
    ```bash
    git commit -m "Fix <issue-id>: <description>"
    ```
 
-6. **Create a Pull Request**  
+6. **Create a Pull Request**:
    Submit a pull request on GitHub and describe the fix.
 
 ---
@@ -145,7 +147,8 @@ They may request you to make changes or improvements before merging your pull re
 
 By contributing to this project, you agree that your contributions will be licensed under the [GNU AGPLv3](./LICENSE).
 
-Your contributions will be publicly available as a member of the `CheeredAdventure` organization and you will be listed on the contributors list as a special partner of our organization.
+Your contributions will be publicly available as a member of the `CheeredAdventure` organization,
+and you will be listed on the contributors list as a special partner of our organization.
 
 If you do not wish to be listed as a contributor, please let us know in advance or **CLEARLY** indicate in the initial description of your pull request that you wish to be anonymized.
 

@@ -1,6 +1,6 @@
 # ReverseCraft Reimagined
 
-Docs in another language are available in [here](./docs/index.markdown)
+Docs in another language are available [here](./docs/index.markdown)
 
 ReverseCraft Reimagined is a Minecraft mod that reverses the crafting system.
 With this mod, you can disassemble items back into their original materials.

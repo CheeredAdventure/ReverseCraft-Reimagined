@@ -66,7 +66,7 @@ To contribute to this project, you will need the following tools:
   - Constants: `UPPER_SNAKE_CASE`
     - **Exception**: `org.slf4j.Logger` instance is usually a `private static final` constant. but we treat it as normal static field, thus it is `lowerCamelCase`.
 
-There is no particular rules for naming variables. Your variables should be named in a way that
+There are no particular rules for naming variables. Your variables should be named in a way that
 makes sense to you and your code!
 
 ---

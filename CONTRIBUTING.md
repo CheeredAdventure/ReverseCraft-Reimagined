@@ -147,7 +147,8 @@ They may request you to make changes or improvements before merging your pull re
 
 By contributing to this project, you agree that your contributions will be licensed under the [GNU AGPLv3](./LICENSE).
 
-Your contributions will be publicly available as a member of the `CheeredAdventure` organization,
+Your contributions will be publicly available as a member of the `CheeredAdventure` community
+organization,
 and you will be listed on the contributors list as a special partner of our organization.
 
 If you do not wish to be listed as a contributor, please let us know in advance or **CLEARLY** indicate in the initial description of your pull request that you wish to be anonymized.

@@ -76,4 +76,5 @@ This project appreciates the support of the Minecraft community and the modding 
 We also have grateful respect for the original [ReverseCraft mod](https://github.com/Unyuho/RevereseCraft) and its author.
 We are not affiliated/related to the original mod, author, or any other projects.
 
-We are the community member of [CheeredAdventure](https://github.com/CheeredAdventure) organization, and we are working on this project to make it better and more fun for everyone.
+We are the community member of [CheeredAdventure](https://github.com/CheeredAdventure) community
+organization, and we are working on this project to make it better and more fun for everyone.

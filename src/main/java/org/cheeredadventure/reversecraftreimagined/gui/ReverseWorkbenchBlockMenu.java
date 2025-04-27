@@ -14,7 +14,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -80,30 +79,6 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
             this.reverseWorkbenchBlockEntity,
             this.slots.subList(36, 45)));
     });
-  }
-
-  public static void displayDummyItems(List<Ingredient> ingredients, int width, int height) {
-    ReverseWorkbenchBlockMenu menu = (ReverseWorkbenchBlockMenu) Objects.requireNonNull(
-      Minecraft.getInstance().player).containerMenu;
-    List<Slot> craftGridSlots = menu.slots.subList(36, 45);
-    for (int column = 0; column < width; column++) {
-      for (int row = 0; row < height; row++) {
-        final int index = row * width + column;
-        final int craftGridIndex = row * 3 + column;
-        Slot slot = craftGridSlots.get(craftGridIndex);
-        if (index < ingredients.size()) {
-          Ingredient ingredient = ingredients.get(index);
-          ItemStack itemStack =
-            ingredient.getItems().length > 0 ? ingredient.getItems()[0].copy() : ItemStack.EMPTY;
-          slot.set(itemStack);
-        } else {
-          slot.set(ItemStack.EMPTY);
-        }
-      }
-    }
-    for (Slot craftGridSlot : craftGridSlots) {
-      craftGridSlot.setChanged();
-    }
   }
 
   public static void clearDummyItems() {

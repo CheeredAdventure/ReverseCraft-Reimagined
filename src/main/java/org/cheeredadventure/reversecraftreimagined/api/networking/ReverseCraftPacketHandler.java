@@ -8,12 +8,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseRecipeSearcher;
 import org.cheeredadventure.reversecraftreimagined.blocks.ReverseWorkbenchBlockEntity;
 import org.cheeredadventure.reversecraftreimagined.internal.functionality.ReverseRecipeSearcherImpl;
@@ -46,7 +42,7 @@ public class ReverseCraftPacketHandler implements IPacketHandler<ReverseCraftPac
       log.debug("blockPos: {}", blockPos);
 
       BlockEntity entity = player.level().getBlockEntity(blockPos);
-      if (!(entity instanceof ReverseWorkbenchBlockEntity)) {
+      if (!(entity instanceof ReverseWorkbenchBlockEntity blockEntity)) {
         log.warn("our ReverseWorkbenchBlockEntity is missing!");
         return;
       }
@@ -55,27 +51,15 @@ public class ReverseCraftPacketHandler implements IPacketHandler<ReverseCraftPac
 
       if (recipes.isEmpty()) {
         log.info("No recipe found for target item: {}", targetItem);
+//        blockEntity.clearGridInventory();
+//        blockEntity.setChanged();
         return;
       }
 
       // TODO: implement a way to handle multiple recipes
       CraftingRecipe recipe = recipes.get(0);
-      List<Ingredient> ingredients = recipe.getIngredients();
-      int recipeWidth, recipeHeight;
-      if (recipe instanceof ShapedRecipe shaped) {
-        recipeWidth = shaped.getRecipeWidth();
-        recipeHeight = shaped.getRecipeHeight();
-      } else if (recipe instanceof ShapelessRecipe shapeless) {
-        final int recipeMaxItemCount = shapeless.getIngredients().size();
-        // Configure the number of material items, such as 3x1 + 2, 3x2 + 1, 3x3, as the width and height of the recipe grid.
-        recipeWidth = Math.min(recipeMaxItemCount, 3);
-        recipeHeight = recipeMaxItemCount > 3 ? recipeMaxItemCount / 3 : 1;
-      } else {
-        log.error("Unknown recipe type: {}", recipe.getClass().getName());
-        return;
-      }
-      ReverseRecipePacket packet = new ReverseRecipePacket(ingredients, recipeWidth, recipeHeight);
-      PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
+      blockEntity.updateGridInventoryFromRecipe(recipe);
+      blockEntity.setChanged();
 
       log.info("Found {} recipes for target item: {}", recipes.size(), targetItem);
       recipes.forEach(r -> log.debug("Found ingredients: {}", r.getIngredients()));

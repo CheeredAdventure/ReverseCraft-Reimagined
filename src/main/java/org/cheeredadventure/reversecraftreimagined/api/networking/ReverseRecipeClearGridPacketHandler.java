@@ -5,8 +5,9 @@ import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent.Context;
-import net.minecraftforge.network.PacketDistributor;
+import org.cheeredadventure.reversecraftreimagined.blocks.ReverseWorkbenchBlockEntity;
 import org.slf4j.Logger;
 
 public class ReverseRecipeClearGridPacketHandler implements
@@ -29,8 +30,13 @@ public class ReverseRecipeClearGridPacketHandler implements
     ctx.get().enqueueWork(() -> {
       ServerPlayer player = ctx.get().getSender();
       BlockPos blockPos = msg.getBlockPos();
-      ReverseRecipeClearGridClientPacket packet = new ReverseRecipeClearGridClientPacket(blockPos);
-      PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), packet);
+      BlockEntity entity = player.level().getBlockEntity(blockPos);
+      if (entity instanceof ReverseWorkbenchBlockEntity blockEntity) {
+        blockEntity.clearGridInventory();
+        blockEntity.setChanged();
+      } else {
+        log.error("Our BlockEntity is missing!");
+      }
     });
     ctx.get().setPacketHandled(true);
   }

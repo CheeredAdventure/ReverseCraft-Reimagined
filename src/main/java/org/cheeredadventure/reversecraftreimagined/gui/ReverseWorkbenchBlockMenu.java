@@ -1,11 +1,8 @@
 package org.cheeredadventure.reversecraftreimagined.gui;
 
 import com.mojang.logging.LogUtils;
-import java.util.List;
-import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,6 +14,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import org.cheeredadventure.reversecraftreimagined.api.BlockInit;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
@@ -81,16 +81,44 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
     });
   }
 
-  public static void clearDummyItems() {
-    ReverseWorkbenchBlockMenu menu = (ReverseWorkbenchBlockMenu) Objects.requireNonNull(
-      Minecraft.getInstance().player).containerMenu;
-    List<Slot> craftGridSlots = menu.slots.subList(36, 45);
-    for (Slot craftGridSlot : craftGridSlots) {
-      craftGridSlot.set(ItemStack.EMPTY);
+  @Override
+  public void removed(Player pPlayer) {
+    super.removed(pPlayer);
+
+    if (pPlayer.level().isClientSide()) {
+      return;
     }
-    for (Slot craftGridSlot : craftGridSlots) {
-      craftGridSlot.setChanged();
-    }
+
+    LazyOptional<IItemHandler> lazyOptional = this.reverseWorkbenchBlockEntity
+      .getCapability(ForgeCapabilities.ITEM_HANDLER);
+    lazyOptional.ifPresent(handler -> {
+      boolean changed = false;
+      boolean isResultSlotEmpty = handler.getStackInSlot(9).isEmpty();
+      for (int i = 0; i < 9; i++) {
+        ItemStack stack = handler.getStackInSlot(i);
+        if (isResultSlotEmpty) {
+          pPlayer.addItem(stack);
+        }
+        if (!stack.isEmpty() && handler instanceof ItemStackHandler itemStackHandler) {
+          itemStackHandler.setStackInSlot(i, ItemStack.EMPTY);
+          changed = true;
+        } else if (!stack.isEmpty()) {
+          log.warn("Unexpected item stack in slot {}: {}", i, stack);
+        }
+      }
+      ItemStack resultStack = handler.getStackInSlot(9);
+      pPlayer.addItem(resultStack);
+      this.reverseWorkbenchBlockEntity.clearGridInventory();
+      if (!resultStack.isEmpty() && handler instanceof ItemStackHandler itemStackHandler) {
+        itemStackHandler.setStackInSlot(9, ItemStack.EMPTY);
+        changed = true;
+      } else {
+        log.warn("Unexpected item stack in result slot: {}", resultStack);
+      }
+      if (changed) {
+        this.reverseWorkbenchBlockEntity.setChanged();
+      }
+    });
   }
 
   @Override

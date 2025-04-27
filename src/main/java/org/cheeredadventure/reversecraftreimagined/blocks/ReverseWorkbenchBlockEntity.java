@@ -75,9 +75,11 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
   public void drops() {
     SimpleContainer inventory = new SimpleContainer(this.inventory.getSlots());
     for (int i = 0; i < this.inventory.getSlots(); i++) {
-      inventory.setItem(i, this.inventory.getStackInSlot(i));
+      ItemStack stack = this.inventory.getStackInSlot(i);
+      inventory.setItem(i, stack);
     }
-    Containers.dropContents(this.level, this.worldPosition, inventory);
+    this.inventory.setStackInSlot(9, ItemStack.EMPTY);
+    Containers.dropContents(Objects.requireNonNull(this.level), this.worldPosition, inventory);
   }
 
   private void clearGridInventoryInternal() {
@@ -177,7 +179,8 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
 
   @Override
   protected void saveAdditional(CompoundTag tag) {
-    tag.put("inventory", this.inventory.serializeNBT());
+
+    tag.put("inventory", this.inventory.getStackInSlot(9).serializeNBT());
     super.saveAdditional(tag);
   }
 

@@ -99,21 +99,25 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
         if (isResultSlotEmpty) {
           pPlayer.addItem(stack);
         }
-        if (!stack.isEmpty() && handler instanceof ItemStackHandler itemStackHandler) {
-          itemStackHandler.setStackInSlot(i, ItemStack.EMPTY);
-          changed = true;
-        } else if (!stack.isEmpty()) {
-          log.warn("Unexpected item stack in slot {}: {}", i, stack);
+        if (!stack.isEmpty()) {
+          if (handler instanceof ItemStackHandler itemStackHandler) {
+            itemStackHandler.setStackInSlot(i, ItemStack.EMPTY);
+            changed = true;
+          } else {
+            log.warn("Unexpected item stack in slot {}: {}", i, stack);
+          }
         }
       }
       ItemStack resultStack = handler.getStackInSlot(9);
       pPlayer.addItem(resultStack);
       this.reverseWorkbenchBlockEntity.clearGridInventory();
-      if (!resultStack.isEmpty() && handler instanceof ItemStackHandler itemStackHandler) {
-        itemStackHandler.setStackInSlot(9, ItemStack.EMPTY);
-        changed = true;
-      } else {
-        log.warn("Unexpected item stack in result slot: {}", resultStack);
+      if (!resultStack.isEmpty()) {
+        if (handler instanceof ItemStackHandler itemStackHandler) {
+          itemStackHandler.setStackInSlot(9, ItemStack.EMPTY);
+          changed = true;
+        } else {
+          log.warn("Unexpected item stack in result slot: {}", resultStack);
+        }
       }
       if (changed) {
         this.reverseWorkbenchBlockEntity.setChanged();

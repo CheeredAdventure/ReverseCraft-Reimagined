@@ -51,8 +51,8 @@ public class ReverseCraftPacketHandler implements IPacketHandler<ReverseCraftPac
 
       if (recipes.isEmpty()) {
         log.info("No recipe found for target item: {}", targetItem);
-//        blockEntity.clearGridInventory();
-//        blockEntity.setChanged();
+        blockEntity.clearGridInventory();
+        blockEntity.setChanged();
         return;
       }
 

@@ -99,19 +99,16 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
       final int width = shaped.getWidth();
       final int height = shaped.getHeight();
       final List<Ingredient> ingredients = shaped.getIngredients();
-      for (int row = 0; row < height; row++) {
-        for (int column = 0; column < width; column++) {
-          final int recipeIndex = row * width + column;
-          final int inventoryIndex = row * 3 + column;
-          if (recipeIndex >= ingredients.size()) {
-            continue;
+      for (int column = 0; column < width; column++) {
+        for (int row = 0; row < height; row++) {
+          final int index = row * width + column;
+          final int craftGridIndex = row * 3 + column;
+          if (index < ingredients.size()) {
+            Ingredient ingredient = ingredients.get(index);
+            ItemStack stack =
+              ingredient.getItems().length > 0 ? ingredient.getItems()[0].copy() : ItemStack.EMPTY;
+            this.inventory.setStackInSlot(craftGridIndex, stack);
           }
-          final Ingredient ingredient = ingredients.get(recipeIndex);
-          if (ingredient.isEmpty()) {
-            continue;
-          }
-          final ItemStack item = ingredient.getItems()[0].copy();
-          this.inventory.setStackInSlot(recipeIndex, item);
         }
       }
     } else if (recipe instanceof ShapelessRecipe shapeless) {

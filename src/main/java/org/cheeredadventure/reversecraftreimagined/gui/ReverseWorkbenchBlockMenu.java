@@ -70,7 +70,17 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
       for (int row = 0; row < 3; row++) {
         for (int column = 0; column < 3; column++) {
           addSlot(
-            new SlotItemHandler(IItemhandler, row * 3 + column, 30 + column * 18, 17 + row * 18));
+            new SlotItemHandler(IItemhandler, row * 3 + column, 30 + column * 18, 17 + row * 18) {
+              @Override
+              public boolean mayPlace(@NotNull ItemStack stack) {
+                return false;
+              }
+
+              @Override
+              public boolean mayPickup(Player playerIn) {
+                return false;
+              }
+            });
         }
       }
         this.addSlot(
@@ -133,8 +143,7 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
       ItemStack itemstack1 = slot.getItem();
       itemstack = itemstack1.copy();
       if (i < VANILLA_SLOT_COUNT) {
-        if (!this.moveItemStackTo(itemstack1, REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX,
-          REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX + REVERSE_WORKBENCH_SLOT_COUNT, false)) {
+        if (!this.moveItemStackTo(itemstack1, this.slots.size() - 1, this.slots.size(), false)) {
           return ItemStack.EMPTY;
         }
       } else if (i < REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX + REVERSE_WORKBENCH_SLOT_COUNT) {

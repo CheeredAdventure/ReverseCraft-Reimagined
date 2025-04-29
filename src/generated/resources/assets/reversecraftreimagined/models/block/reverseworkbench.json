@@ -4,6 +4,7 @@
     "down": "minecraft:block/oak_planks",
     "east": "minecraft:block/crafting_table_front",
     "north": "minecraft:block/crafting_table_side",
+    "particle": "minecraft:block/oak_planks",
     "south": "minecraft:block/crafting_table_front",
     "up": "minecraft:block/crafting_table_top",
     "west": "minecraft:block/crafting_table_side"

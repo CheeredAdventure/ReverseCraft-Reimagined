@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Containers;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent.Context;
@@ -51,7 +53,9 @@ public class ReversingWorkPacketHandler implements IPacketHandler<ReversingWorkP
         ItemStack copy = ingredient.copy();
         ingredient.shrink(ingredient.getCount());
         copy.setCount(1);
-        player.getInventory().add(copy);
+        if (!player.getInventory().add(copy)) {
+          Containers.dropContents(player.level(), blockPos, new SimpleContainer(copy));
+        }
       }
       reverseWorkbenchBlockEntity.getInventory().setStackInSlot(9, ItemStack.EMPTY);
     });

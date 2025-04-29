@@ -24,5 +24,11 @@ public class DataGenerators {
     ExistingFileHelper fileHelper = event.getExistingFileHelper();
     generator.addProvider(event.includeClient(),
       new ReverseWorkbenchBlockStateProvider(generator.getPackOutput(), fileHelper));
+    generator.addProvider(event.includeServer(), new ReverseWorkbenchBlockTagsProvider(
+      generator.getPackOutput(), event.getLookupProvider(), fileHelper
+    ));
+    generator.addProvider(event.includeServer(), new ReverseWorkbenchBlockLootTableProvider(
+      generator.getPackOutput()
+    ));
   }
 }

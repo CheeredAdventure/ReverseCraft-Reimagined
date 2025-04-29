@@ -127,6 +127,13 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
     }
   }
 
+  /**
+   * @param recipe         recipe that set to the craft grid
+   * @param craftGridSlots 3x3 crafting grid to set the recipe
+   * @param <T>            recipe type (Crafting, Shaped, Shapeless, etc.)
+   * @deprecated This API controls crafting grid in client side, causing bugs. use
+   * {@link #updateGridInventoryFromRecipe(Recipe)} instead.
+   */
   @Deprecated(forRemoval = true, since = "0.1.0.1")
   public <T extends Recipe<?>> void setDummyItems(T recipe, List<Slot> craftGridSlots) {
     if (recipe instanceof ShapedRecipe shaped) {

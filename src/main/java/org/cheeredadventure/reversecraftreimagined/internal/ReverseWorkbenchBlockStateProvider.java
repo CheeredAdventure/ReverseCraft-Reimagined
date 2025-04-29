@@ -24,6 +24,7 @@ public class ReverseWorkbenchBlockStateProvider extends BlockStateProvider {
           mcLoc("block/crafting_table_side"),
           mcLoc("block/crafting_table_front"),
           mcLoc("block/crafting_table_front"),
-          mcLoc("block/crafting_table_side")));
+          mcLoc("block/crafting_table_side"))
+        .texture("particle", mcLoc("block/oak_planks")));
   }
 }

@@ -1,11 +1,8 @@
 package org.cheeredadventure.reversecraftreimagined.gui;
 
 import com.mojang.logging.LogUtils;
-import java.util.List;
-import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -14,10 +11,12 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import org.cheeredadventure.reversecraftreimagined.api.BlockInit;
 import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchMenuTypes;
@@ -71,7 +70,17 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
       for (int row = 0; row < 3; row++) {
         for (int column = 0; column < 3; column++) {
           addSlot(
-            new SlotItemHandler(IItemhandler, row * 3 + column, 30 + column * 18, 17 + row * 18));
+            new SlotItemHandler(IItemhandler, row * 3 + column, 30 + column * 18, 17 + row * 18) {
+              @Override
+              public boolean mayPlace(@NotNull ItemStack stack) {
+                return false;
+              }
+
+              @Override
+              public boolean mayPickup(Player playerIn) {
+                return false;
+              }
+            });
         }
       }
         this.addSlot(
@@ -82,40 +91,48 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
     });
   }
 
-  public static void displayDummyItems(List<Ingredient> ingredients, int width, int height) {
-    ReverseWorkbenchBlockMenu menu = (ReverseWorkbenchBlockMenu) Objects.requireNonNull(
-      Minecraft.getInstance().player).containerMenu;
-    List<Slot> craftGridSlots = menu.slots.subList(36, 45);
-    for (int column = 0; column < width; column++) {
-      for (int row = 0; row < height; row++) {
-        final int index = row * width + column;
-        final int craftGridIndex = row * 3 + column;
-        Slot slot = craftGridSlots.get(craftGridIndex);
-        if (index < ingredients.size()) {
-          Ingredient ingredient = ingredients.get(index);
-          ItemStack itemStack =
-            ingredient.getItems().length > 0 ? ingredient.getItems()[0].copy() : ItemStack.EMPTY;
-          slot.set(itemStack);
-        } else {
-          slot.set(ItemStack.EMPTY);
+  @Override
+  public void removed(Player pPlayer) {
+    super.removed(pPlayer);
+
+    if (pPlayer.level().isClientSide()) {
+      return;
+    }
+
+    LazyOptional<IItemHandler> lazyOptional = this.reverseWorkbenchBlockEntity
+      .getCapability(ForgeCapabilities.ITEM_HANDLER);
+    lazyOptional.ifPresent(handler -> {
+      boolean changed = false;
+      boolean isResultSlotEmpty = handler.getStackInSlot(9).isEmpty();
+      for (int i = 0; i < 9; i++) {
+        ItemStack stack = handler.getStackInSlot(i);
+        if (isResultSlotEmpty) {
+          pPlayer.addItem(stack);
+        }
+        if (!stack.isEmpty()) {
+          if (handler instanceof ItemStackHandler itemStackHandler) {
+            itemStackHandler.setStackInSlot(i, ItemStack.EMPTY);
+            changed = true;
+          } else {
+            log.warn("Unexpected item stack in slot {}: {}", i, stack);
+          }
         }
       }
-    }
-    for (Slot craftGridSlot : craftGridSlots) {
-      craftGridSlot.setChanged();
-    }
-  }
-
-  public static void clearDummyItems() {
-    ReverseWorkbenchBlockMenu menu = (ReverseWorkbenchBlockMenu) Objects.requireNonNull(
-      Minecraft.getInstance().player).containerMenu;
-    List<Slot> craftGridSlots = menu.slots.subList(36, 45);
-    for (Slot craftGridSlot : craftGridSlots) {
-      craftGridSlot.set(ItemStack.EMPTY);
-    }
-    for (Slot craftGridSlot : craftGridSlots) {
-      craftGridSlot.setChanged();
-    }
+      ItemStack resultStack = handler.getStackInSlot(9);
+      pPlayer.addItem(resultStack);
+      this.reverseWorkbenchBlockEntity.clearGridInventory();
+      if (!resultStack.isEmpty()) {
+        if (handler instanceof ItemStackHandler itemStackHandler) {
+          itemStackHandler.setStackInSlot(9, ItemStack.EMPTY);
+          changed = true;
+        } else {
+          log.warn("Unexpected item stack in result slot: {}", resultStack);
+        }
+      }
+      if (changed) {
+        this.reverseWorkbenchBlockEntity.setChanged();
+      }
+    });
   }
 
   @Override
@@ -126,8 +143,7 @@ public class ReverseWorkbenchBlockMenu extends AbstractContainerMenu {
       ItemStack itemstack1 = slot.getItem();
       itemstack = itemstack1.copy();
       if (i < VANILLA_SLOT_COUNT) {
-        if (!this.moveItemStackTo(itemstack1, REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX,
-          REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX + REVERSE_WORKBENCH_SLOT_COUNT, false)) {
+        if (!this.moveItemStackTo(itemstack1, this.slots.size() - 1, this.slots.size(), false)) {
           return ItemStack.EMPTY;
         }
       } else if (i < REVERSE_WORKBENCH_INVENTORY_FIRST_SLOT_INDEX + REVERSE_WORKBENCH_SLOT_COUNT) {

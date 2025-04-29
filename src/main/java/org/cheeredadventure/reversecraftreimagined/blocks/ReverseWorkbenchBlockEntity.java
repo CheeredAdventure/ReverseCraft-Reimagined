@@ -1,6 +1,8 @@
 package org.cheeredadventure.reversecraftreimagined.blocks;
 
+import com.mojang.logging.LogUtils;
 import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,6 +35,7 @@ import org.cheeredadventure.reversecraftreimagined.api.ReverseWorkbenchBlockEnti
 import org.cheeredadventure.reversecraftreimagined.gui.ReverseWorkbenchBlockMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 @Getter
 public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProvider {
@@ -40,14 +43,11 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
   // 9 slots for crafting grid, 1 slot for result
   private final ItemStackHandler inventory = new ItemStackHandler(9 + 1);
   private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
-  private ItemStack[] gridItems = new ItemStack[9];
+  private static final Logger log = LogUtils.getLogger();
 
 
   public ReverseWorkbenchBlockEntity(BlockPos pos, BlockState state) {
     super(ReverseWorkbenchBlockEntities.REVERSE_WORKBENCH_BLOCK_ENTITY.get(), pos, state);
-    for (int i = 0; i < 9; i++) {
-      this.gridItems[i] = ItemStack.EMPTY;
-    }
   }
 
   @Override
@@ -75,11 +75,66 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
   public void drops() {
     SimpleContainer inventory = new SimpleContainer(this.inventory.getSlots());
     for (int i = 0; i < this.inventory.getSlots(); i++) {
-      inventory.setItem(i, this.inventory.getStackInSlot(i));
+      ItemStack stack = this.inventory.getStackInSlot(i);
+      inventory.setItem(i, stack);
     }
-    Containers.dropContents(this.level, this.worldPosition, inventory);
+    this.inventory.setStackInSlot(9, ItemStack.EMPTY);
+    Containers.dropContents(Objects.requireNonNull(this.level), this.worldPosition, inventory);
   }
 
+  private void clearGridInventoryInternal() {
+    for (int i = 0; i < 9; i++) {
+      this.inventory.setStackInSlot(i, ItemStack.EMPTY);
+    }
+  }
+
+  public void clearGridInventory() {
+    clearGridInventoryInternal();
+  }
+
+  public <T extends Recipe<?>> void updateGridInventoryFromRecipe(T recipe) {
+    clearGridInventoryInternal();
+
+    if (Objects.requireNonNull(recipe) instanceof ShapedRecipe shaped) {
+      final int width = shaped.getWidth();
+      final int height = shaped.getHeight();
+      final List<Ingredient> ingredients = shaped.getIngredients();
+      for (int column = 0; column < width; column++) {
+        for (int row = 0; row < height; row++) {
+          final int index = row * width + column;
+          final int craftGridIndex = row * 3 + column;
+          if (index < ingredients.size()) {
+            Ingredient ingredient = ingredients.get(index);
+            ItemStack stack =
+              ingredient.getItems().length > 0 ? ingredient.getItems()[0].copy() : ItemStack.EMPTY;
+            this.inventory.setStackInSlot(craftGridIndex, stack);
+          }
+        }
+      }
+    } else if (recipe instanceof ShapelessRecipe shapeless) {
+      final List<Ingredient> ingredients = shapeless.getIngredients();
+      for (int i = 0; i < ingredients.size(); i++) {
+        final Ingredient ingredient = ingredients.get(i);
+        if (ingredient.isEmpty()) {
+          continue;
+        }
+        final ItemStack item =
+          ingredient.getItems().length > 0 ? ingredient.getItems()[0].copy() : ItemStack.EMPTY;
+        this.inventory.setStackInSlot(i, item);
+      }
+    } else {
+      log.warn("Unsupported recipe type: {}", recipe.getType());
+    }
+  }
+
+  /**
+   * @param recipe         recipe that set to the craft grid
+   * @param craftGridSlots 3x3 crafting grid to set the recipe
+   * @param <T>            recipe type (Crafting, Shaped, Shapeless, etc.)
+   * @deprecated This API controls crafting grid in client side, causing bugs. use
+   * {@link #updateGridInventoryFromRecipe(Recipe)} instead.
+   */
+  @Deprecated(forRemoval = true, since = "0.1.0.1")
   public <T extends Recipe<?>> void setDummyItems(T recipe, List<Slot> craftGridSlots) {
     if (recipe instanceof ShapedRecipe shaped) {
       final int width = shaped.getWidth();
@@ -115,11 +170,6 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
     this.setChanged();
   }
 
-  public void setGridItems(ItemStack[] gridItems) {
-    this.gridItems = gridItems;
-    this.setChanged();
-  }
-
   @Override
   public @NotNull Component getDisplayName() {
     return Helper.KeyString.getTranslatableKey(ComponentType.CONTAINER, "reverseworkbenchcrafting");
@@ -133,10 +183,8 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
 
   @Override
   protected void saveAdditional(CompoundTag tag) {
-    tag.put("inventory", this.inventory.serializeNBT());
-    for (int i = 0; i < 9; i++) {
-      tag.put("gridItem" + i, this.gridItems[i].save(new CompoundTag()));
-    }
+
+    tag.put("inventory", this.inventory.getStackInSlot(9).serializeNBT());
     super.saveAdditional(tag);
   }
 
@@ -144,9 +192,6 @@ public class ReverseWorkbenchBlockEntity extends BlockEntity implements MenuProv
   public void load(@NotNull CompoundTag tag) {
     super.load(tag);
     this.inventory.deserializeNBT(tag.getCompound("inventory"));
-    for (int i = 0; i < 9; i++) {
-      this.gridItems[i] = ItemStack.of(tag.getCompound("gridItem" + i));
-    }
   }
 
   @Override

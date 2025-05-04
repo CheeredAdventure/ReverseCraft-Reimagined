@@ -41,6 +41,11 @@ public class ReverseCraftPacketHandler implements IPacketHandler<ReverseCraftPac
       log.debug("itemStack: {}", targetItem);
       log.debug("blockPos: {}", blockPos);
 
+      if (targetItem.isDamaged()) {
+        log.warn("Target item is damaged, cannot reverse craft: {}", targetItem);
+        return;
+      }
+
       BlockEntity entity = player.level().getBlockEntity(blockPos);
       if (!(entity instanceof ReverseWorkbenchBlockEntity blockEntity)) {
         log.warn("our ReverseWorkbenchBlockEntity is missing!");

@@ -38,6 +38,24 @@ To use it:
 3. Place the item you want to disassemble in the right slot.
 4. Click the "Reverse" button to disassemble the item shown in the left 3x3 grid.
 
+### About the `Snapshot` version
+
+We serve the `Snapshot` version based on the latest main commit.
+This version may contain followings:
+
+- New features that are not yet released.
+- Latest possible bug fixes.
+- Unstable or non-tested functionality.
+
+Navigate
+to [Actions](https://github.com/CheeredAdventure/ReverseCraft-Reimagined/actions/workflows/snapshot.yaml)
+tab and select the latest workflow run.
+You can download the latest `Snapshot` version from the `Artifacts` section of the workflow summary
+page.
+
+> [!NOTE]
+> The workflow may take a while to finish after the commit.
+
 ## Contribution
 
 Contributions are welcome! Follow these steps to contribute to the project:

@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '**.java'
+      - 'src/**'
+      - '!src/test/**'
   workflow_dispatch:
 
 jobs:

@@ -5,6 +5,8 @@ on:
       - main
     paths:
       - '**.java'
+      - 'src/**'
+      - '!src/test/**'
   workflow_dispatch:
 
 jobs:
